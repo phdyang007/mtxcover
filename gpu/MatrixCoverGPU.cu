@@ -1,10 +1,7 @@
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
-#include "cub/cub/cub.cuh"
-#include "cub/cub/device/device_reduce.cuh"
-#include "MatrixCoverGPU.h"
 
-__global__ void delete_rows_and_columns(int** dl_matrix, int* deleted_rows, int* deleted_cols, int* search_depth, int* selected_row_id, const int* total_dl_matrix_row_num, const int* total_dl_matrix_col_num)
+#include "MatrixCoverGPU.cuh"
+
+__global__ void delete_rows_and_columns(int*dl_matrix[], int* deleted_rows, int* deleted_cols, int* search_depth, int* selected_row_id, const int* total_dl_matrix_row_num, const int* total_dl_matrix_col_num)
 {
 	for (int i = threadIdx.x; i < *total_dl_matrix_col_num; i=i+blockDim.x)
 	{
@@ -32,7 +29,7 @@ __global__ void init_vectors(int* vec, const int *vec_length)
 }
 
 
-
+/*
 void get_largest_value_launcher(int* vec, cub::KeyValuePair<int, int> *argmax, int vec_length)
 {
 	void* d_temp_storage = NULL;
@@ -43,6 +40,24 @@ void get_largest_value_launcher(int* vec, cub::KeyValuePair<int, int> *argmax, i
 	// Run argmax-reduction
 	cub::DeviceReduce::ArgMax(d_temp_storage, temp_storage_bytes, vec, argmax, vec_length);
 	cudaFree(d_temp_storage);
+}
+*/
+
+__global__ void get_largest_value(int* vec, int *conflict_col_id, const int *vec_length)
+{
+	__shared__ int max = 0;
+	for (int i = threadIdx.x; i< *vec_length; i = i + blockDim.x)
+	{
+		atmicMax(&max, vec[i]);
+	}
+	__syncthreads();
+	for (int i = threadIdx.x; i< *vec_length; i = i + blockDim.x)
+	{
+		if (vec[i]==max)
+		{
+			*conflict_col_id = i;
+		}
+	}
 }
 
 
@@ -72,7 +87,7 @@ __global__ void check_existance_of_candidate_rows(int* deleted_rows, int* row_gr
 }
 
 
-__global__ void get_vertex_row_group(int* row_group, int** dl_matrix, const int *vertex_num, const int *total_dl_matrix_row_num)
+__global__ void get_vertex_row_group(int* row_group, int* dl_matrix[], const int *vertex_num, const int *total_dl_matrix_row_num)
 {
 	for (int i = threadIdx.x; i < *vertex_num; i = i + blockDim.x)
 	{
@@ -133,7 +148,8 @@ __global__ void recover_results(int* results, int *search_depth, const int *tota
 
 
 //problem: need to optimized to map on GPU array
-__global__ void get_conflict_node_id(int* deleted_rows, int* row_group, int *search_depth, int *conflict_node_id, const int *total_dl_matrix_row_num) {
+__global__ void get_conflict_node_id(int* deleted_rows, int* row_group, int *search_depth, int *conflict_node_id, const int *total_dl_matrix_row_num) 
+{
 	*conflict_node_id = 0;
 	for (int i = threadIdx.x; i < *total_dl_matrix_row_num; i = i+ blockDim.x) {
 		if (row_group[i] == *search_depth + 1 && deleted_rows[i] > *conflict_node_id) {
@@ -145,11 +161,11 @@ __global__ void get_conflict_node_id(int* deleted_rows, int* row_group, int *sea
 
 
 //problem
-__global__ void get_conflict_col(int** dl_matrix, int* deleted_rows, int* deleted_cols, int* row_group, int *conflict_node_id, int *search_depth, int *conflict_col_id, const int* vertex_num, const int *total_dl_matrix_row_num, const int *total_dl_matrix_col_num) {
+__global__ void get_conflict_col(int* dl_matrix[], int* deleted_rows, int* deleted_cols, int* row_group, int *conflict_node_id, int *search_depth, int *conflict_col_id, const int* vertex_num, const int *total_dl_matrix_row_num, const int *total_dl_matrix_col_num) {
 	*conflict_col_id = 0;
 	for (int i = threadIdx.x; i < *total_dl_matrix_row_num; i=i+blockDim.x) {  
 		//find the conflict edge that connects current node and the most closest node.
-		if (row_group[i] == search_depth + 1 && deleted_rows[i] == conflict_node_id) {
+		if (row_group[i] == *search_depth + 1 && deleted_rows[i] == *conflict_node_id) {
 			//for (int j = total_dl_matrix_col_num - 1; j > vertex_num; j--) {
 			//	if (dl_matrix[i][j] * deleted_cols[j] == conflict_node_id) {
 			//		atomicExch(conflict_col_id, j);
@@ -183,7 +199,7 @@ __global__ void remove_cols(int* deleted_cols, int* col_group, int *conflict_col
 
 
 __global__ void mc_solver(
-	int** dl_matrix,
+	int* dl_matrix[],
 	int* results,
 	int* deleted_cols,
 	int* col_group,
@@ -211,7 +227,9 @@ __global__ void mc_solver(
 	__shared__ int conflict_node_id;
 	__shared__ int conflict_col_id;
 	__shared__ int hard_conflict_threshold = 500;
-	__shared__ int existance_of_candidate_rows;
+	__shared__ int existance_of_candidate_rows = false;
+
+	//int dl_matrix[total_dl_matrix_row_num][total_dl_matrix_col_num];
 
 	const int block_count = 1;
 	const int thread_count = 1024;
@@ -257,30 +275,30 @@ __global__ void mc_solver(
 				//conflict_col_id = get_conflict_col(dl_matrix, deleted_rows, deleted_cols, row_group, conflict_node_id, search_depth, vertex_num, total_dl_matrix_row_num, total_dl_matrix_col_num); // get conflict edge
 				//std::cout << "conflict col id is " << conflict_col_id << std::endl;
 				conflict_count[conflict_col_id]++;                                                                   //update conflict edge count
-				recover_deleted_rows(deleted_rows, search_depth, total_dl_matrix_row_num);                           //recover deleted rows  previously selected rows
-				recover_deleted_cols(deleted_cols, search_depth, total_dl_matrix_col_num);                           //recover deleted cols except afftected by previously selected rows
-				recover_results(results, search_depth, total_dl_matrix_row_num);                                     //recover results
+				recover_deleted_rows<<<block_count, thread_count >>>(deleted_rows, &search_depth, &total_dl_matrix_row_num);                           //recover deleted rows  previously selected rows
+				recover_deleted_cols<<<block_count, thread_count >>>(deleted_cols, &search_depth, &total_dl_matrix_col_num);                           //recover deleted cols except afftected by previously selected rows
+				recover_results<<<block_count, thread_count >>>(results, &search_depth, &total_dl_matrix_row_num);                                     //recover results
 
 				if (conflict_count[conflict_col_id] > hard_conflict_threshold)
 				{
 					search_depth = 1;
-					init_vectors(conflict_count, total_dl_matrix_col_num);
-					init_vectors_reserved(deleted_cols, total_dl_matrix_col_num);
-					init_vectors(deleted_rows, total_dl_matrix_row_num);
-					init_vectors(results, total_dl_matrix_row_num);
-					remove_cols(deleted_cols, col_group, conflict_col_id, total_dl_matrix_col_num);
+					init_vectors<<<block_count, thread_count >>>(conflict_count, &total_dl_matrix_col_num);
+					init_vectors_reserved<<<block_count, thread_count >>>(deleted_cols, &total_dl_matrix_col_num);
+					init_vectors<<<block_count, thread_count >>>(deleted_rows, &total_dl_matrix_row_num);
+					init_vectors<<<block_count, thread_count >>>(results, &total_dl_matrix_row_num);
+					remove_cols<<<block_count, thread_count >>>(deleted_cols, col_group, &conflict_col_id, &total_dl_matrix_col_num);
 					deleted_cols[conflict_col_id] = -1;
 				}
 			}
 			else
 			{ //if all vertices are gone through, directly remove the edge with largest conflict count.
 				search_depth = 1;
-				conflict_col_id = get_largest_value(conflict_count, total_dl_matrix_col_num);
-				init_vectors(conflict_count, total_dl_matrix_col_num);
-				init_vectors_reserved(deleted_cols, total_dl_matrix_col_num);
-				init_vectors(deleted_rows, total_dl_matrix_row_num);
-				init_vectors(results, total_dl_matrix_row_num);
-				remove_cols(deleted_cols, col_group, conflict_col_id, total_dl_matrix_col_num);
+				get_largest_value<<<block_count, thread_count >>>(conflict_count, &conflict_col_id, &total_dl_matrix_col_num);
+				init_vectors<<<block_count, thread_count >>>(conflict_count, &total_dl_matrix_col_num);
+				init_vectors_reserved<<<block_count, thread_count >>>(deleted_cols, &total_dl_matrix_col_num);
+				init_vectors<<<block_count, thread_count >>>(deleted_rows, &total_dl_matrix_row_num);
+				init_vectors<<<block_count, thread_count >>>(results, &total_dl_matrix_row_num);
+				remove_cols<<<block_count, thread_count >>>(deleted_cols, col_group, &conflict_col_id, &total_dl_matrix_col_num);
 			}
 			//print_vec(deleted_cols, total_dl_matrix_col_num);
 			//print_vec(deleted_rows, total_dl_matrix_row_num);
@@ -289,8 +307,8 @@ __global__ void mc_solver(
 		}
 	}
 
-	delete[] deleted_rows;
-	delete[] row_group;
-	delete[] vertices_covered;
-	delete[] conflict_count;
+	//delete[] deleted_rows;
+	//delete[] row_group;
+	//delete[] vertices_covered;
+	//delete[] conflict_count;
 }
