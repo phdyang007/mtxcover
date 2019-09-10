@@ -5,9 +5,9 @@
 int main()
 {
 	std::ifstream file("matrix.txt");
-    int total_dl_matrix_row_num=2244;
+    int total_dl_matrix_row_num=276;
     //int total_dl_matrix_row_num=235; /
-    int total_dl_matrix_col_num=55;
+    int total_dl_matrix_col_num=29;
 	/*
     int tmp_matrix[total_dl_matrix_row_num][total_dl_matrix_col_num] = {
         {1, 0, 0, 1, 0, 1, 0, 0, 0},
@@ -41,7 +41,7 @@ int main()
     //int col_group[total_dl_matrix_col_num]={0};// = {-1 -2 -3 -4 -5 -6 -7 -8 -9 -10 -11 -12 1 1 1 2 2 2 3 3 3 4 4 4 5 5 5 6 6 6 7 7 7 8 8 8 9 9 9 10 10 10 11 11 11 12 12 12 13 13 13 14 14 14 15 15 15 16 16 16 17 17 17 18 18 18 19 19 19 20 20 20 21 21 21};
 	//memset(col_group, 0, sizeof(col_group));
     int conflict_count = 0;
-    int vertex_num = 10;
+    int vertex_num = 5;
     int *results = new int[total_dl_matrix_row_num];
     mc_solver(dl_matrix, results, deleted_cols, col_group, vertex_num, total_dl_matrix_row_num, total_dl_matrix_col_num);
 

@@ -8,7 +8,7 @@ __global__ void delete_rows_and_columns(int*dl_matrix, int* deleted_rows, int* d
 		if (dl_matrix[selected_row_id*total_dl_matrix_col_num+i] == 1 && deleted_cols[i] == 0)//we only delete rows that are not deleted or removed
 		{ 
 			deleted_cols[i] = search_depth;
-			for (int j = 1; j < total_dl_matrix_row_num; j++)
+			for (int j = 0; j < total_dl_matrix_row_num; j++)
 			{
 				if (dl_matrix[j*total_dl_matrix_col_num+i] == 1 && deleted_rows[j] == 0)
 				{
@@ -312,7 +312,8 @@ void mc_solver(int* dl_matrix,	int* results, int* deleted_cols, int* deleted_row
 			delete_rows_and_columns <<<block_count, thread_count >>> (dl_matrix, deleted_rows, deleted_cols, search_depth, *selected_row_id, total_dl_matrix_row_num, total_dl_matrix_col_num); //delete covered rows and columns
 			//__syncthreads();
 			//deleted_rows[*selected_row_id] = -search_depth;
-			cudaMemset(&deleted_rows[*selected_row_id],-search_depth,sizeof(int));
+			set_vector_value<<<1,1>>>(deleted_rows, *selected_row_id, -search_depth);
+
 			search_depth++; //next step
 			//print_vec(deleted_cols, total_dl_matrix_col_num);
 			//print_vec(deleted_rows, total_dl_matrix_row_num);
