@@ -1,9 +1,11 @@
 
 test.bin: MatrixCoverGPU.o TestMC.o
-	nvcc MatrixCoverGPU.o TestMC.o -o $@
+	nvcc -arch=sm_35 -rdc=true MatrixCoverGPU.o TestMC.o -o $@
 
 MatrixCoverGPU.o: MatrixCoverGPU.cu 
-	nvcc -c MatrixCoverGPU.cu
+	nvcc -c -arch=sm_35 -rdc=true MatrixCoverGPU.cu
 
 TestMC.o: TestMC.cu 
-	nvcc -c TestMC.cu
+	nvcc -c -arch=sm_35 -rdc=true TestMC.cu
+
+	
