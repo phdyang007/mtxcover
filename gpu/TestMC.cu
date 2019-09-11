@@ -150,7 +150,7 @@ int main()
     	gt>>gtr[i];
 	}
 	int *gtcol= new int[total_dl_matrix_col_num];
-	///init_vectors<<<1,32>>>(gtcol, total_dl_matrix_col_num);
+	init_vectors<<<1,32>>>(gtcol, total_dl_matrix_col_num);
 
 	for(int i=0; i<vertex_num; i++){
 		for(int j=0; j<total_dl_matrix_col_num; j++){

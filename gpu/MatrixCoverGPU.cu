@@ -105,6 +105,7 @@ __global__ void select_row(int* deleted_rows, int* row_group, const int search_d
 		if (deleted_rows[i] == 0 && row_group[i] == search_depth)
 		{
 			atomicExch(selected_row_id, i);
+			atomicMin(selected_row_id, i);
 		}
 	}
 	__syncthreads();
