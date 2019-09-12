@@ -25,7 +25,7 @@ __global__ void init_vectors_reserved(int *vec, const int vec_length);
 
 
 
-__global__ void check_existance_of_candidate_rows(int* deleted_rows, int* row_group, const int search_depth, bool *token, const int total_dl_matrix_row_num);
+__global__ void check_existance_of_candidate_rows(int* deleted_rows, int* row_group, const int search_depth, int *token, int *selected_row_id, const int total_dl_matrix_row_num);
 
 
 
@@ -39,7 +39,7 @@ __global__ void print_vec(int *vec, int vec_length);
 
 
 
-__global__ void select_row(int* deleted_rows, int* row_group, const int search_depth, const int total_dl_matrix_row_num, int* selected_row_id);
+//__global__ void select_row(int* deleted_rows, int* row_group, const int search_depth, const int total_dl_matrix_row_num, int* selected_row_id);
 
 
 

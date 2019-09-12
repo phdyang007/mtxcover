@@ -143,29 +143,7 @@ int main()
     std::cout << "Conflict Num is " << conflict_count / 3 << std::endl;
        
     
-    std::cout<<"ground truth"<<std::endl;
-    std::ifstream gt("gt.txt");
-    int *gtr=new int[vertex_num];
-    for(int i=0; i<vertex_num; i++){
-    	gt>>gtr[i];
-	}
-	int *gtcol= new int[total_dl_matrix_col_num];
-	init_vectors<<<1,32>>>(gtcol, total_dl_matrix_col_num);
 
-	for(int i=0; i<vertex_num; i++){
-		for(int j=0; j<total_dl_matrix_col_num; j++){
-			if(gtr[i]<vertex_num*3){
-				gtcol[j]=gtcol[j]+dl_matrix[i*total_dl_matrix_col_num+j];
-			}else{
-				gtcol[j]=gtcol[j]+dl_matrix[(i-1)*total_dl_matrix_col_num+j];
-			}
-		}
-	}
-	
-	for(int i=0; i<total_dl_matrix_col_num; i++){
-		std::cout << gtcol[i]<< ' ';
-	}
-	std::cout<< std::endl;
 	
 
     cudaFree(dl_matrix_gpu);

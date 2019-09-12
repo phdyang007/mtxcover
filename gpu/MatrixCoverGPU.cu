@@ -5,7 +5,7 @@ __global__ void delete_rows_and_columns(int*dl_matrix, int* deleted_rows, int* d
 {
 	for (int i = threadIdx.x; i < total_dl_matrix_col_num; i=i+blockDim.x)
 	{
-		if (dl_matrix[selected_row_id*total_dl_matrix_col_num+i] == 1 && deleted_cols[i] == 0)//we only delete rows that are not deleted or removed
+		if (dl_matrix[selected_row_id*total_dl_matrix_col_num+i] == 1 && deleted_cols[i] == 0)
 		{ 
 			deleted_cols[i] = search_depth;
 			for (int j = 0; j < total_dl_matrix_row_num; j++)
@@ -71,7 +71,7 @@ __global__ void init_vectors_reserved(int *vec, const int vec_length)
     }
 }
 
-__global__ void check_existance_of_candidate_rows(int* deleted_rows, int* row_group, const int search_depth, int *token, const int total_dl_matrix_row_num)
+__global__ void check_existance_of_candidate_rows(int* deleted_rows, int* row_group, const int search_depth, int *token, int * selected_row_id, const int total_dl_matrix_row_num)
 {
 	for (int i = threadIdx.x; i < total_dl_matrix_row_num; i = i + blockDim.x)
 	{
@@ -80,8 +80,10 @@ __global__ void check_existance_of_candidate_rows(int* deleted_rows, int* row_gr
 		{
 			//std::cout<<"Candidate Row Found...."<<std::endl;
 			atomicExch(token, 1);
+			atomicMin(selected_row_id, i);
 		}
 	}
+	__syncthreads();
 }
 
 
@@ -97,7 +99,7 @@ __global__ void get_vertex_row_group(int* row_group, int* dl_matrix, const int v
 	}
 }
 
-
+/*
 __global__ void select_row(int* deleted_rows, int* row_group, const int search_depth, const int total_dl_matrix_row_num, int* selected_row_id)
 {
 	for (int i = threadIdx.x; i < total_dl_matrix_row_num; i = i + blockDim.x)
@@ -110,7 +112,7 @@ __global__ void select_row(int* deleted_rows, int* row_group, const int search_d
 	}
 	__syncthreads();
 }
-
+*/
 
 __global__ void recover_deleted_rows(int* deleted_rows, const int search_depth, const int total_dl_matrix_row_num)
 {
@@ -293,18 +295,18 @@ void mc_solver(int* dl_matrix,	int* results, int* deleted_cols, int* deleted_row
 		std::cout<<"results "<<std::endl;
 		print_vec<<<1,1>>>(results, total_dl_matrix_row_num_gpu);
 		cudaDeviceSynchronize();
-		std::cin>>brk;
+		//std::cin>>brk;
 		cudaMemset(existance_of_candidate_rows_gpu,0,sizeof(int));
-		cudaMemset(selected_row_id_gpu,-1,sizeof(int));
+		cudaMemset(selected_row_id_gpu,total_dl_matrix_row_num,sizeof(int));
 		//existance_of_candidate_rows=0;
 		//selected_row_id=-1;
-		check_existance_of_candidate_rows <<<block_count, thread_count >>> (deleted_rows, row_group, search_depth, existance_of_candidate_rows_gpu, total_dl_matrix_row_num);
+		check_existance_of_candidate_rows <<<block_count, thread_count >>> (deleted_rows, row_group, search_depth, existance_of_candidate_rows_gpu, selected_row_id_gpu, total_dl_matrix_row_num);
 		//__syncthreads();
 		cudaMemcpy(existance_of_candidate_rows, existance_of_candidate_rows_gpu, sizeof(int), cudaMemcpyDeviceToHost);
 		std::cout<<"check_existance_of_candidate_rows "<<std::endl;
 		if (*existance_of_candidate_rows==1)
 		{                                                                                                 //check if there are candidate rows existing, if no, do backtrace
-			select_row <<<block_count, thread_count >>> (deleted_rows, row_group, search_depth, total_dl_matrix_row_num, selected_row_id_gpu); //select row and add to results
+			//select_row <<<block_count, thread_count >>> (deleted_rows, row_group, search_depth, total_dl_matrix_row_num, selected_row_id_gpu); //select row and add to results
 			cudaMemcpy(selected_row_id, selected_row_id_gpu, sizeof(int), cudaMemcpyDeviceToHost);
 			std::cout<<"selected row id is "<<*selected_row_id<<std::endl;
 			//__syncthreads();
