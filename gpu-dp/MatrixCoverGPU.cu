@@ -1,18 +1,21 @@
 
 #include "MatrixCoverGPU.cuh"
 
-__global__ void delete_rows_and_columns(int*dl_matrix, int* deleted_rows, int* deleted_cols, const int search_depth, const int selected_row_id, const int total_dl_matrix_row_num, const int total_dl_matrix_col_num)
+__global__ void delete_rows_and_columns(int*dl_matrix, int* deleted_rows, int* deleted_cols, const int *search_depth, const int *selected_row_id, const int *total_dl_matrix_row_num, const int *total_dl_matrix_col_num, const int graph_count)
 {
-	for (int i = threadIdx.x; i < total_dl_matrix_col_num; i=i+blockDim.x)
+	for (int k = blockIdx.x; k< graph_count; k = k + gridDim.x)
 	{
-		if (dl_matrix[selected_row_id*total_dl_matrix_col_num+i] == 1 && deleted_cols[i] == 0)//we only delete rows that are not deleted or removed
-		{ 
-			deleted_cols[i] = search_depth;
-			for (int j = 0; j < total_dl_matrix_row_num; j++)
-			{
-				if (dl_matrix[j*total_dl_matrix_col_num+i] == 1 && deleted_rows[j] == 0)
+		for (int i = threadIdx.x; i < total_dl_matrix_col_num[k]; i=i+blockDim.x)
+		{
+			if (dl_matrix[k*total_dl_matrix_row_num[k]* total_dl_matrix_col_num[k]+selected_row_id[k]*total_dl_matrix_col_num[k]+i] == 1 && deleted_cols[k*total_dl_matrix_col_num[k]+i] == 0)//we only delete rows that are not deleted or removed
+			{ 
+				deleted_cols[k*total_dl_matrix_col_num[k]+i] = search_depth[k];
+				for (int j = 0; j < total_dl_matrix_row_num[k]; j++)
 				{
-					atomicExch(deleted_rows+j, search_depth);
+					if (dl_matrix[k*total_dl_matrix_row_num[k]* total_dl_matrix_col_num[k]+j*total_dl_matrix_col_num[k]+i] == 1 && deleted_rows[k*total_dl_matrix_col_num[k]+j] == 0)
+					{
+						atomicExch(k*total_dl_matrix_row_num[k]+deleted_rows+j, search_depth[k]);
+					}
 				}
 			}
 		}
@@ -20,12 +23,15 @@ __global__ void delete_rows_and_columns(int*dl_matrix, int* deleted_rows, int* d
 }
 
 
-__global__ void init_vectors(int* vec, const int vec_length)
+__global__ void init_vectors(int* vec, const int *vec_length, const int graph_count)
 {
-	for (int i = threadIdx.x; i < vec_length; i = i + blockDim.x)
+	for (int k=blockIdx.x; k<graph_count; k= k+gridDim.x)
 	{
-		vec[i] = 0;
-	}
+		for (int i = threadIdx.x; i < vec_length[k]; i = i + blockDim.x)
+		{
+			vec[k*vec_length[k]+i] = 0;
+		}
+	}	
 }
 
 
@@ -43,22 +49,27 @@ void get_largest_value_launcher(int* vec, cub::KeyValuePair<int, int> *argmax, i
 }
 */
 
-__global__ void get_largest_value(int* vec, int *conflict_col_id, const int vec_length, int max)
+__global__ void get_largest_value(int* vec, int *conflict_col_id, const int *vec_length, int *max, const int graph_count)
 {
-	
-	for (int i = threadIdx.x; i< vec_length; i = i + blockDim.x)
+	for (int k=blockIdx.x; k<graph_count; k = k+gridDim.x)
 	{
-		atomicMax(&max, vec[i]);
-	}
-	for (int i = threadIdx.x; i< vec_length; i = i + blockDim.x)
-	{
-		if (vec[i]==max)
+		for (int i = threadIdx.x; i< vec_length[k]; i = i + blockDim.x)
 		{
-			*conflict_col_id = i;
+			atomicMax(max+k, vec[k*vec_length[k]+i]);
+		}
+		for (int i = threadIdx.x; i< vec_length[k]; i = i + blockDim.x)
+		{
+			if (vec[k*vec_length[k]+i]==max)
+			{
+				conflict_col_id[k] = i;
+			}
 		}
 	}
+
 }
 
+
+//+=============================================================================================================================================
 
 __global__ void init_vectors_reserved(int *vec, const int vec_length)
 {
