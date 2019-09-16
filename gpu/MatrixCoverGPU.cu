@@ -295,7 +295,7 @@ void mc_solver(int* dl_matrix,	int* results, int* deleted_cols, int* deleted_row
 		std::cout<<"results "<<std::endl;
 		print_vec<<<1,1>>>(results, total_dl_matrix_row_num_gpu);
 		cudaDeviceSynchronize();
-		//std::cin>>brk;
+		std::cin>>brk;
 		cudaMemset(existance_of_candidate_rows_gpu,0,sizeof(int));
 		cudaMemset(selected_row_id_gpu,total_dl_matrix_row_num,sizeof(int));
 		//existance_of_candidate_rows=0;
