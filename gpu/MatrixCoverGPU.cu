@@ -337,7 +337,7 @@ void mc_solver(int* dl_matrix,	int* results, int* deleted_cols, int* deleted_row
 				cudaMemcpy(conflict_col_id, conflict_col_id_gpu, sizeof(int), cudaMemcpyDeviceToHost);
 
 				//conflict_count[*conflict_col_id]++;                                                                   //update conflict edge count
-				add_gpu<<<1,1>>>(&deleted_rows[*selected_row_id],1);
+				add_gpu<<<1,1>>>(&conflict_count[*conflict_col_id_gpu],1);
 				recover_deleted_rows<<<block_count, thread_count >>>(deleted_rows, search_depth, total_dl_matrix_row_num);                           //recover deleted rows  previously selected rows
 				//__syncthreads();
 				recover_deleted_cols<<<block_count, thread_count >>>(deleted_cols, search_depth, total_dl_matrix_col_num);                           //recover deleted cols except afftected by previously selected rows
@@ -362,7 +362,7 @@ void mc_solver(int* dl_matrix,	int* results, int* deleted_cols, int* deleted_row
 			else
 			{ //if all vertices are gone through, directly remove the edge with largest conflict count.
 				search_depth = 1;
-				get_largest_value<<<block_count, thread_count >>>(conflict_count, conflict_col_id_gpu, total_dl_matrix_col_num);
+				get_largest_value<<<block_count, thread_count >>>(conflict_count, conflict_col_id_gpu, total_dl_matrix_col_num, 0);
 				cudaMemcpy(conflict_col_id, conflict_col_id_gpu, sizeof(int), cudaMemcpyDeviceToHost);
 				//__syncthreads();
 				init_vectors<<<block_count, thread_count >>>(conflict_count, total_dl_matrix_col_num);
