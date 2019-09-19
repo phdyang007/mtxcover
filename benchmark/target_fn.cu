@@ -1,5 +1,6 @@
 #include "target_fn.h"
 
+#include "../cpu/MatrixCover.h"
 #include "../gpu-mg/MatrixCoverGPU.cuh"
 #include "../gpu/MatrixCoverGPU.cuh"
 
@@ -13,6 +14,55 @@
 //     std::vector<int> dl_matrix;
 // vertex_num
 // };
+MeasureTimer Invoke_ORIGINAL_CPU(DataSet *dataset, bool print_result) {
+  MeasureTimer timer;
+
+  int total_col = dataset->total_dl_matrix_col_num;
+  int total_row = dataset->total_dl_matrix_row_num;
+
+  std::vector<int> results(total_row, 0);
+  std::vector<int> deleted_cols(total_col, 0);
+  int **dl_matrix = new int *[total_row];
+  for (int i = 0; i < total_row; i++) {
+    dl_matrix[i] = new int[total_col];
+    for (int j = 0; j < total_col; j++) {
+      dl_matrix[i][j] = dataset->dl_matrix[i * total_col + j];
+    }
+  }
+
+  timer.StartCoreTime();
+  mc_solver(dl_matrix, results.data(), deleted_cols.data(),
+            dataset->col_group.data(), dataset->vertex_num, total_row,
+            total_col);
+  timer.EndCoreTime();
+  if (print_result) {
+    int conflict_count = 0;
+    for (int i = 0; i < total_row; i++) {
+      std::cout << results[i] << ' ';
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < total_row; i++) {
+      if (results[i] > 0) {
+        std::cout << i << ' ';
+      }
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < total_col; i++) {
+      if (deleted_cols[i] == -1) {
+        conflict_count++;
+      }
+    }
+
+    std::cout << "Conflict Num is " << conflict_count / 3 << std::endl;
+  }
+
+  for (int i = 0; i < total_row; i++) {
+    delete[] dl_matrix[i];
+  }
+  delete[] dl_matrix;
+
+  return timer;
+}
 
 MeasureTimer Invoke_ORIGINAL_GPU(DataSet *dataset, bool print_result) {
   MeasureTimer timer;
@@ -287,6 +337,8 @@ MeasureTimer Invoke(const ImplVersion version, bool print_result,
                     DataSet *dataset) {
   MeasureTimer default_timer;
   switch (version) {
+  case ImplVersion::ORIGINAL_CPU:
+    return Invoke_ORIGINAL_CPU(dataset, print_result);
   case ImplVersion::ORIGINAL_GPU:
     return Invoke_ORIGINAL_GPU(dataset, print_result);
   default:
