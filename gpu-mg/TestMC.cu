@@ -173,7 +173,7 @@ int main()
 
 
     cudaDeviceSynchronize();
-    mc_solver<<<2,32>>>(dl_matrix_gpu, results_gpu, 
+    gpu_mg::mc_solver<<<2,32>>>(dl_matrix_gpu, results_gpu, 
         deleted_cols_gpu, deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
         vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
         offset_col_gpu, offset_row_gpu, offset_matrix_gpu,
