@@ -33,7 +33,7 @@ __device__ void get_vertex_row_group(int *row_group, int *dl_matrix,
 // void print_vec(int *vec, int vec_length);
 
 //__device__ void select_row(int* deleted_rows, int* row_group, const int
-//search_depth, const int total_dl_matrix_row_num, int* selected_row_id);
+// search_depth, const int total_dl_matrix_row_num, int* selected_row_id);
 
 __device__ void recover_deleted_rows(int *deleted_rows, const int search_depth,
                                      const int total_dl_matrix_row_num);
@@ -62,14 +62,14 @@ __device__ void remove_cols(int *deleted_cols, int *col_group,
                             const int total_dl_matrix_col_num);
 
 __global__ void
-mc_solver(int *dl_matrix, int *results, int *deleted_cols, int *deleted_rows,
-          int *col_group, int *row_group, int *conflict_count, int *vertex_num,
-          int *total_dl_matrix_row_num, int *total_dl_matrix_col_num,
-          int *offset_col, int *offset_row, int *offset_matrix,
-          int *search_depth, int *selected_row_id, int *current_conflict_count,
-          int *conflict_node_id, int *conflict_col_id,
-          int *existance_of_candidate_rows, const int graph_count,
-          const int hard_conflict_threshold);
+mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
+          int *deleted_cols, int *deleted_rows, int *col_group, int *row_group,
+          int *conflict_count, int *vertex_num, int *total_dl_matrix_row_num,
+          int *total_dl_matrix_col_num, int *offset_col, int *offset_row,
+          int *offset_matrix, int *search_depth, int *selected_row_id,
+          int *current_conflict_count, int *conflict_node_id,
+          int *conflict_col_id, int *existance_of_candidate_rows,
+          const int graph_count, const int hard_conflict_threshold);
 // void mc_solver(int* dl_matrix, int* results, int* deleted_cols, int*
 // deleted_rows, int* col_group,int* row_group, int* conflict_count,	const
 // int vertex_num, const int total_dl_matrix_row_num, const int

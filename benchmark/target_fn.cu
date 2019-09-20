@@ -200,9 +200,17 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
 
   timer.StartDataLoadTime();
   int *dl_matrix_gpu;
+  int *next_col_gpu;
+  int *next_row_gpu;
   int *results_gpu;
   cudaMalloc(&dl_matrix_gpu, sizeof(int) * total_matrix);
+  cudaMalloc(&next_col_gpu, sizeof(int) * total_matrix);
+  cudaMalloc(&next_row_gpu, sizeof(int) * total_matrix);
   cudaMemcpy(dl_matrix_gpu, datasets->dl_matrix.data(),
+             sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
+  cudaMemcpy(next_col_gpu, datasets->next_col.data(),
+             sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
+  cudaMemcpy(next_row_gpu, datasets->next_row.data(),
              sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
   cudaMalloc(&results_gpu, sizeof(int) * total_row);
 
@@ -274,12 +282,13 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   cudaDeviceSynchronize();
   timer.StartCoreTime();
   gpu_mg::mc_solver<<<n, thread_size>>>(
-      dl_matrix_gpu, results_gpu, deleted_cols_gpu, deleted_rows_gpu,
-      col_group_gpu, row_group_gpu, conflict_count_gpu, vertex_num_gpu,
-      total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu, offset_col_gpu,
-      offset_row_gpu, offset_matrix_gpu, search_depth_gpu, selected_row_id_gpu,
-      current_conflict_count_gpu, conflict_node_id_gpu, conflict_col_id_gpu,
-      existance_of_candidate_rows_gpu, n, hard_conflict_threshold);
+      dl_matrix_gpu, next_col_gpu, next_row_gpu, results_gpu, deleted_cols_gpu,
+      deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
+      vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
+      offset_col_gpu, offset_row_gpu, offset_matrix_gpu, search_depth_gpu,
+      selected_row_id_gpu, current_conflict_count_gpu, conflict_node_id_gpu,
+      conflict_col_id_gpu, existance_of_candidate_rows_gpu, n,
+      hard_conflict_threshold);
   cudaDeviceSynchronize();
   timer.EndCoreTime();
 
@@ -312,6 +321,8 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   }
 
   cudaFree(dl_matrix_gpu);
+  cudaFree(next_col_gpu);
+  cudaFree(next_row_gpu);
   cudaFree(results_gpu);
   cudaFree(deleted_cols_gpu);
   cudaFree(deleted_rows_gpu);
