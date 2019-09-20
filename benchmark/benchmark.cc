@@ -6,6 +6,20 @@ std::vector<std::string> test_configs = {"configs/config.txt"};
 
 int main() {
   // GPU
+  std::cout << "========================\nCPU BENCHMARK\n\n";
+  for (const auto &config_file : test_configs) {
+    std::vector<DataSet> dataset = ReadDataSet(config_file);
+    for (auto &ds : dataset) {
+      auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
+
+      std::cout << "> Core Used NS: " << std::to_string(timer.GetCoreUsedNs())
+                << std::endl;
+      std::cout << "> Load to GPU Used NS: "
+                << std::to_string(timer.GetDataLoadingNs()) << std::endl;
+    }
+  }
+
+  // GPU
   std::cout << "========================\nGPU BENCHMARK\n\n";
   for (const auto &config_file : test_configs) {
     std::vector<DataSet> dataset = ReadDataSet(config_file);

@@ -11,6 +11,8 @@ struct DataSet {
   int total_dl_matrix_col_num;
   std::vector<int> dl_matrix;
   std::vector<int> col_group;
+  std::vector<int> next_row;
+  std::vector<int> next_col;
 };
 
 struct DataSets {
@@ -23,6 +25,9 @@ struct DataSets {
   std::vector<int> offset_col;
   std::vector<int> dl_matrix;
   std::vector<int> col_group;
+
+  std::vector<int> next_row;
+  std::vector<int> next_col;
 };
 
 class MeasureTimer {
