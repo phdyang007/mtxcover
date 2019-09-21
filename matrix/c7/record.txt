@@ -1,0 +1,5 @@
+bench/sim_c7.gds DL
+color time 0.14s(22.0%), 0.64s real
+total time 0.29s(28.4%), 1.02s real
+Stitch number: 7
+Conflict number: 0

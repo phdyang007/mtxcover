@@ -1,0 +1,5 @@
+bench/sim_s4.gds DL
+color time 27.80s(24.0%), 116.02s real
+total time 60.29s(40.5%), 148.82s real
+Stitch number: 134
+Conflict number: 108

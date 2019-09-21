@@ -107,9 +107,10 @@ int get_conflict_node_id(int *deleted_rows, int *row_group, int search_depth,
                          int total_dl_matrix_row_num) {
   int conflict_node_id = 0;
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    if (row_group[i] == search_depth + 1 &&
-        deleted_rows[i] > conflict_node_id) {
-      conflict_node_id = deleted_rows[i];
+    if (row_group[i] == search_depth + 1) {
+      if(conflict_node_id < deleted_rows[i]) {
+        conflict_node_id = deleted_rows[i];
+      }
     }
   }
   return conflict_node_id;
@@ -120,16 +121,31 @@ int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
                      int vertex_num, int total_dl_matrix_row_num,
                      int total_dl_matrix_col_num) {
   int conflict_col_id = 0;
+  int idxa = 0;
+  int idxb = 0;
   for (int i = 0; i < total_dl_matrix_row_num;
        i++) { // find the conflict edge that connects current node and the most
               // closest node.
+    if (deleted_rows[i]==-conflict_node_id){
+      idxa = i;
+    }
     if (row_group[i] == search_depth + 1 &&
         deleted_rows[i] == conflict_node_id) {
-      for (int j = total_dl_matrix_col_num - 1; j > vertex_num; j--) {
-        if (dl_matrix[i][j] * deleted_cols[j] == conflict_node_id) {
-          conflict_col_id = j;
-        }
-      }
+      idxb = i;
+    }
+    //if (row_group[i] == search_depth + 1 &&
+    //   deleted_rows[i] == conflict_node_id) {
+    //  for (int j = total_dl_matrix_col_num - 1; j > vertex_num; j--) {
+    //    if (dl_matrix[i][j] * deleted_cols[j] == conflict_node_id) {
+    //      conflict_col_id = j;
+    //    }
+    //  }
+    //}
+  }
+  for (int j=total_dl_matrix_col_num-1; j > vertex_num; j--) {
+    if(dl_matrix[idxa][j]==dl_matrix[idxb][j] && deleted_cols[j]>0) {
+      conflict_col_id=j;
+      break;
     }
   }
   return conflict_col_id;
@@ -168,7 +184,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
   int conflict_node_id;
   int conflict_col_id;
   int hard_conflict_threshold = 2;
-
+  char tmp;
   // init lots of vectors
   init_vectors(conflict_count, total_dl_matrix_col_num);
   init_vectors(deleted_cols, total_dl_matrix_col_num);
@@ -184,8 +200,18 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
 #endif
 
   for (search_depth = 1; search_depth <= vertex_num;) {
-    // std::cout<<"search depth is "<<search_depth<<std::endl;
 
+
+    std::cout<<"Deleted Cols"<<std::endl;
+    print_vec(deleted_cols, total_dl_matrix_col_num);
+    std::cout<<"Deleted Rows"<<std::endl;
+    print_vec(deleted_rows, total_dl_matrix_row_num);
+    std::cout<<"Conflict Count"<<std::endl;
+    print_vec(conflict_count, total_dl_matrix_col_num);
+    std::cout<<"Results"<<std::endl;
+    print_vec(results, total_dl_matrix_row_num);
+    std::cin>>tmp;
+    std::cout<<"search depth is "<<search_depth<<std::endl;
     if (check_existance_of_candidate_rows(
             deleted_rows, row_group, search_depth,
             total_dl_matrix_row_num)) { // check if there are candidate rows
@@ -215,6 +241,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
             search_depth, vertex_num, total_dl_matrix_row_num,
             total_dl_matrix_col_num); // get conflict edge
 #ifndef BENCHMARK
+        std::cout << "conflict node id is " << conflict_node_id << std::endl;
         std::cout << "conflict col id is " << conflict_col_id << std::endl;
 #endif
         conflict_count[conflict_col_id]++; // update conflict edge count
@@ -252,10 +279,8 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
         remove_cols(deleted_cols, col_group, conflict_col_id,
                     total_dl_matrix_col_num);
       }
-      // print_vec(deleted_cols, total_dl_matrix_col_num);
-      // print_vec(deleted_rows, total_dl_matrix_row_num);
-      // print_vec(conflict_count, total_dl_matrix_col_num);
-      // print_vec(results, total_dl_matrix_row_num);
+
+
     }
   }
 

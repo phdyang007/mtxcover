@@ -1,0 +1,5 @@
+bench/sim_c9.gds DL
+color time 2.15s(17.9%), 12.02s real
+total time 2.91s(22.7%), 12.82s real
+Stitch number: 132
+Conflict number: 77

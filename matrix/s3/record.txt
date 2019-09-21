@@ -1,0 +1,5 @@
+bench/sim_s3.gds DL
+color time 31.11s(25.9%), 120.19s real
+total time 61.34s(40.6%), 150.92s real
+Stitch number: 64
+Conflict number: 122
