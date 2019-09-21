@@ -156,9 +156,8 @@ __device__ void get_conflict_node_id(int *deleted_rows, int *row_group,
                                      int *conflict_node_id,
                                      const int total_dl_matrix_row_num) {
   for (int i = threadIdx.x; i < total_dl_matrix_row_num; i = i + blockDim.x) {
-    if (row_group[i] == search_depth + 1 &&
-        deleted_rows[i] > *conflict_node_id) {
-      atomicExch(conflict_node_id, deleted_rows[i]);
+    if (row_group[i] == search_depth + 1) {
+      atomicMax(conflict_node_id, deleted_rows[i]);
     }
   }
   __syncthreads();
@@ -173,26 +172,30 @@ __device__ void get_conflict_col(int *dl_matrix, int *deleted_rows,
                                  const int total_dl_matrix_row_num,
                                  const int total_dl_matrix_col_num) {
   //*conflict_col_id = 0;
+
+  int idxa = 0;
+  int idxb = 0;
   for (int i = threadIdx.x; i < total_dl_matrix_row_num; i = i + blockDim.x) {
     // find the conflict edge that connects current node and the most closest
     // node.
+    if (deleted_rows[i]==-conflict_node_id){
+      idxa = i;
+    }
     if (row_group[i] == search_depth + 1 &&
         deleted_rows[i] == conflict_node_id) {
-      for (int j = total_dl_matrix_col_num - 1; j > vertex_num; j--) {
-        if (dl_matrix[i * total_dl_matrix_col_num + j] * deleted_cols[j] ==
-            conflict_node_id) {
-          atomicExch(conflict_col_id, j);
-        }
-      }
-      // for (int j = 0; j < total_dl_matrix_col_num - vertex_num-1; j++) {
-      //	if (dl_matrix[i*total_dl_matrix_col_num+total_dl_matrix_col_num
-      //-1 -j] * deleted_cols[total_dl_matrix_col_num - 1 - j] ==
-      // conflict_node_id) {
-      //		atomicExch(conflict_col_id, j);
-      //	}
-      //}
+      idxb = i;
     }
+
   }
+  __syncthreads();
+  for (int j=threadIdx.x; j < total_dl_matrix_col_num - vertex_num; j = j + blockDim.x) {
+    if(dl_matrix[idxa*total_dl_matrix_col_num + total_dl_matrix_col_num-j] ==
+       dl_matrix[idxb*total_dl_matrix_col_num + total_dl_matrix_col_num-j] && deleted_cols[j]>0) {
+         atomicMin(conflict_col_id, j);
+       }
+  }
+
+
   __syncthreads();
 }
 
@@ -300,7 +303,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
     init_vectors(t_conflict_count, t_cn);
 #ifndef BENCHMARK
     for (int i = 0; i < t_cn; i++) {
-      printf("%d ", t_conflict_count + i]);
+      printf("%d ", t_conflict_count[i]);
     }
     printf("\n");
 #endif
@@ -343,7 +346,8 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
 
       existance_of_candidate_rows[k] = 0;
       selected_row_id[k] = t_rn;
-
+      conflict_node_id[k] = 0;
+      conflict_col_id[k] = 0;
       // existance_of_candidate_rows=0;
       // selected_row_id=-1;
       check_existance_of_candidate_rows(
