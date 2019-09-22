@@ -1,5 +1,5 @@
 bench/sim_s2.gds DL
-color time 10.64s(29.4%), 36.22s real
-total time 14.91s(36.8%), 40.56s real
-Stitch number: 76
-Conflict number: 55
+color time 6.77s(15.6%), 43.36s real
+total time 7.30s(16.6%), 43.99s real
+Stitch number: 3
+Conflict number: 291
