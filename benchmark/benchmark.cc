@@ -5,22 +5,18 @@
 #include "target_fn.h"
 
 std::vector<std::string> test_datasets = {
-    // "../matrix/s1",
-    "../matrix/s2",
-    //  "../matrix/s3",  "../matrix/s4",
-    // "../matrix/s5", "../matrix/c1", "../matrix/c2",  "../matrix/c3",
-    // "../matrix/c4", "../matrix/c5", "../matrix/c6",  "../matrix/c7",
-    // "../matrix/c8", "../matrix/c9", "../matrix/c10",
+    "../matrix/s1", "../matrix/s2", "../matrix/s3",  "../matrix/s4",
+    "../matrix/s5", "../matrix/c1", "../matrix/c2",  "../matrix/c3",
+    "../matrix/c4", "../matrix/c5", "../matrix/c6",  "../matrix/c7",
+    "../matrix/c8", "../matrix/c9", "../matrix/c10",
 };
 
 std::vector<std::string> validation_sets = {
-    // "../dlresults/s1.txt",
-    "../dlresults/s2.txt"
-    //  , "../dlresults/s3.txt",
-    // "../dlresults/s4.txt", "../dlresults/s5.txt", "../dlresults/c1.txt",
-    // "../dlresults/c2.txt", "../dlresults/c3.txt", "../dlresults/c4.txt",
-    // "../dlresults/c5.txt", "../dlresults/c6.txt", "../dlresults/c7.txt",
-    // "../dlresults/c8.txt", "../dlresults/c9.txt", "../dlresults/c10.txt",
+    "../dlresults/s1.txt", "../dlresults/s2.txt", "../dlresults/s3.txt",
+    "../dlresults/s4.txt", "../dlresults/s5.txt", "../dlresults/c1.txt",
+    "../dlresults/c2.txt", "../dlresults/c3.txt", "../dlresults/c4.txt",
+    "../dlresults/c5.txt", "../dlresults/c6.txt", "../dlresults/c7.txt",
+    "../dlresults/c8.txt", "../dlresults/c9.txt", "../dlresults/c10.txt",
 };
 
 int main(int argc, char *argv[]) {
