@@ -1,16 +1,20 @@
 
 #include "data_reader.h"
 
+#include <algorithm>
 #include <fstream>
 
+
 std::vector<DataSet>
-ReadDataSetFromMatrixFolder(const std::string &matrix_folder) {
+ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
+                            const std::string &result_txt) {
   std::string n_data_txt = matrix_folder + "/n_data.txt";
   std::string col_txt = matrix_folder + "/col_cnt.txt";
   std::string row_txt = matrix_folder + "/row_cnt.txt";
   std::string col_group_txt = matrix_folder + "/col.txt";
   std::string vertex_txt = matrix_folder + "/vetex.txt";
   std::string matrix_txt = matrix_folder + "/matrix.txt";
+  std::string validation_txt = result_txt;
 
   int n = 0;
   {
@@ -24,6 +28,8 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder) {
   std::ifstream row_file(row_txt);
   std::ifstream vertex_file(vertex_txt);
   std::ifstream matrix_file(matrix_txt);
+  std::ifstream validation_file(validation_txt);
+
   for (int k = 0; k < n; ++k) {
     DataSet dataset;
     col_file >> dataset.total_dl_matrix_col_num;
@@ -35,6 +41,7 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder) {
     dataset.next_col.resize(nm);
     dataset.next_row.resize(nm);
     dataset.col_group.resize(dataset.total_dl_matrix_col_num, 0);
+    dataset.expected_result.resize(dataset.vertex_num, 0);
 
     for (int i = 0; i < dataset.total_dl_matrix_col_num; ++i) {
       col_group_file >> dataset.col_group[i];
@@ -46,6 +53,11 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder) {
             dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j];
       }
     }
+
+    for (int i = 0; i < dataset.vertex_num; ++i) {
+      validation_file >> dataset.expected_result[i];
+    }
+    std::sort(dataset.expected_result.begin(), dataset.expected_result.end());
 
     for (int i = 0; i < dataset.total_dl_matrix_row_num; ++i) {
       int last_col = dataset.total_dl_matrix_col_num;
@@ -103,6 +115,10 @@ DataSets CombineDatasets(const std::vector<DataSet> &dataset) {
     datasets.col_group.insert(datasets.col_group.end(),
                               dataset[i].col_group.begin(),
                               dataset[i].col_group.end());
+
+    datasets.expected_result.insert(datasets.expected_result.end(),
+                                    dataset[i].expected_result.begin(),
+                                    dataset[i].expected_result.end());
 
     offset_matrix +=
         dataset[i].total_dl_matrix_col_num * dataset[i].total_dl_matrix_row_num;

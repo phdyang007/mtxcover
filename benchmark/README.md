@@ -9,5 +9,5 @@
   - The `vertex.txt` is the number of vertex
   - The `matrix.txt` is the dl matrix
 2. `make`
-3. `./build/benchmark.bin`
+3. `./build/benchmark.bin` (Can use `./build/benchmark.bin 0` to test time only without  validration result)
 4. Can select another testing dataset by adding to the `test_configs` in the `benchmark.cc`
