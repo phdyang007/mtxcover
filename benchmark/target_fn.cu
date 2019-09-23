@@ -35,6 +35,14 @@ MeasureTimer Invoke_ORIGINAL_CPU(DataSet *dataset, bool print_result) {
             dataset->col_group.data(), dataset->vertex_num, total_row,
             total_col);
   timer.EndCoreTime();
+
+  dataset->final_result.clear();
+  for (int i = 0; i < total_row; i++) {
+    if (results[i] > 0) {
+      dataset->final_result.push_back(i + 1);
+    }
+  }
+
   if (print_result) {
     int conflict_count = 0;
     for (int i = 0; i < total_row; i++) {
@@ -151,7 +159,11 @@ MeasureTimer Invoke_ORIGINAL_GPU(DataSet *dataset, bool print_result) {
              cudaMemcpyDeviceToHost);
   cudaMemcpy(deleted_cols.data(), deleted_cols_gpu,
              sizeof(int) * total_dl_matrix_col_num, cudaMemcpyDeviceToHost);
-
+  for (int i = 0; i < total_row; i++) {
+    if (results[i] > 0) {
+      dataset->final_result.push_back(i + 1);
+    }
+  }
   if (print_result) {
     for (int i = 0; i < total_dl_matrix_row_num; i++) {
       std::cout << results[i] << ' ';
@@ -292,10 +304,19 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   cudaDeviceSynchronize();
   timer.EndCoreTime();
 
+  std::vector<int> results(total_row, 0);
+  cudaMemcpy(results.data(), results_gpu, sizeof(int) * total_row,
+             cudaMemcpyDeviceToHost);
+
+  for (int k = 0; k < n; k++) {
+    for (int i = 0; i < datasets->total_dl_matrix_row_num[k]; i++) {
+      if (results[datasets->offset_row[k] + i] > 0) {
+        datasets->final_result.push_back(i + 1);
+      }
+    }
+  }
+
   if (print_result) {
-    std::vector<int> results(total_row, 0);
-    cudaMemcpy(results.data(), results_gpu, sizeof(int) * total_row,
-               cudaMemcpyDeviceToHost);
     cudaMemcpy(deleted_cols.data(), deleted_cols_gpu, sizeof(int) * total_col,
                cudaMemcpyDeviceToHost);
     for (int k = 0; k < n; k++) {

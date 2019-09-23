@@ -45,7 +45,7 @@ bool check_existance_of_candidate_rows(int *deleted_rows, int *row_group,
                                        int search_depth,
                                        int total_dl_matrix_row_num) {
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    // std::cout<<deleted_rows[i]<<' '<<row_group[i]<<std::endl;
+    // std::cout << deleted_rows[i] << ' ' << row_group[i] << std::endl;
     if (deleted_rows[i] == 0 && row_group[i] == search_depth) {
       // std::cout<<"Candidate Row Found...."<<std::endl;
       return true;
@@ -108,7 +108,7 @@ int get_conflict_node_id(int *deleted_rows, int *row_group, int search_depth,
   int conflict_node_id = 0;
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
     if (row_group[i] == search_depth + 1) {
-      if(conflict_node_id < deleted_rows[i]) {
+      if (conflict_node_id < deleted_rows[i]) {
         conflict_node_id = deleted_rows[i];
       }
     }
@@ -126,14 +126,14 @@ int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
   for (int i = 0; i < total_dl_matrix_row_num;
        i++) { // find the conflict edge that connects current node and the most
               // closest node.
-    if (deleted_rows[i]==-conflict_node_id){
+    if (deleted_rows[i] == -conflict_node_id) {
       idxa = i;
     }
     if (row_group[i] == search_depth + 1 &&
         deleted_rows[i] == conflict_node_id) {
       idxb = i;
     }
-    //if (row_group[i] == search_depth + 1 &&
+    // if (row_group[i] == search_depth + 1 &&
     //   deleted_rows[i] == conflict_node_id) {
     //  for (int j = total_dl_matrix_col_num - 1; j > vertex_num; j--) {
     //    if (dl_matrix[i][j] * deleted_cols[j] == conflict_node_id) {
@@ -142,9 +142,9 @@ int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
     //  }
     //}
   }
-  for (int j=total_dl_matrix_col_num-1; j > vertex_num; j--) {
-    if(dl_matrix[idxa][j]==dl_matrix[idxb][j] && deleted_cols[j]>0) {
-      conflict_col_id=j;
+  for (int j = total_dl_matrix_col_num - 1; j > vertex_num; j--) {
+    if (dl_matrix[idxa][j] == dl_matrix[idxb][j] && deleted_cols[j] > 0) {
+      conflict_col_id = j;
       break;
     }
   }
@@ -200,18 +200,19 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
 #endif
 
   for (search_depth = 1; search_depth <= vertex_num;) {
-
-
-    std::cout<<"Deleted Cols"<<std::endl;
+#ifndef BENCHMARK
+    std::cout << "Deleted Cols" << std::endl;
     print_vec(deleted_cols, total_dl_matrix_col_num);
-    std::cout<<"Deleted Rows"<<std::endl;
+    std::cout << "Deleted Rows" << std::endl;
     print_vec(deleted_rows, total_dl_matrix_row_num);
-    std::cout<<"Conflict Count"<<std::endl;
+    std::cout << "Conflict Count" << std::endl;
     print_vec(conflict_count, total_dl_matrix_col_num);
-    std::cout<<"Results"<<std::endl;
+    std::cout << "Results" << std::endl;
     print_vec(results, total_dl_matrix_row_num);
-    std::cin>>tmp;
-    std::cout<<"search depth is "<<search_depth<<std::endl;
+    std::cin >> tmp;
+    std::cout << "search depth is " << search_depth << std::endl;
+#endif
+
     if (check_existance_of_candidate_rows(
             deleted_rows, row_group, search_depth,
             total_dl_matrix_row_num)) { // check if there are candidate rows
@@ -279,8 +280,6 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
         remove_cols(deleted_cols, col_group, conflict_col_id,
                     total_dl_matrix_col_num);
       }
-
-
     }
   }
 

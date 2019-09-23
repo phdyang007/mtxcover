@@ -4,6 +4,8 @@
 
 #include "common.h"
 
-std::vector<DataSet> ReadDataSet(const std::string &cofig_file);
+std::vector<DataSet>
+ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
+                            const std::string &result_folder);
 
-DataSets CombineDatasets(const std::vector<DataSet>& dataset);
+DataSets CombineDatasets(const std::vector<DataSet> &dataset);

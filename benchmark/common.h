@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cassert>
+
 #include <chrono>
+#include <iostream>
 #include <vector>
 
 using clock_type = std::chrono::high_resolution_clock;
@@ -13,6 +16,9 @@ struct DataSet {
   std::vector<int> col_group;
   std::vector<int> next_row;
   std::vector<int> next_col;
+
+  std::vector<int> expected_result;
+  std::vector<int> final_result;
 };
 
 struct DataSets {
@@ -28,6 +34,9 @@ struct DataSets {
 
   std::vector<int> next_row;
   std::vector<int> next_col;
+
+  std::vector<int> expected_result;
+  std::vector<int> final_result;
 };
 
 class MeasureTimer {
@@ -62,3 +71,19 @@ private:
         .count();
   }
 };
+
+template <typename T>
+void ValidateArray(const std::vector<T> &a, const std::vector<T> &b) {
+  int an = a.size();
+  int bn = b.size();
+  std::cout << "expected n: " << an << "  final n: " << bn << std::endl;
+  assert(an == bn);
+  for (int i = 0; i < an; ++i) {
+    std::cout << a[i] << " <> " << b[i] << ", ";
+  }
+  std::cout << std::endl;
+
+  for (int i = 0; i < an; ++i) {
+    assert(a[i] == b[i]);
+  }
+}
