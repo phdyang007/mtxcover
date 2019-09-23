@@ -3,41 +3,47 @@
 
 #include <fstream>
 
-std::vector<DataSet> ReadDataSet(const std::string &cofig_file) {
-  std::ifstream file(cofig_file);
-  std::vector<DataSet> datasets;
-  int n;
-  file >> n;
-  std::string matrix_file, col_file;
+std::vector<DataSet>
+ReadDataSetFromMatrixFolder(const std::string &matrix_folder) {
+  std::string n_data_txt = matrix_folder + "/n_data.txt";
+  std::string col_txt = matrix_folder + "/col_cnt.txt";
+  std::string row_txt = matrix_folder + "/row_cnt.txt";
+  std::string col_group_txt = matrix_folder + "/col.txt";
+  std::string vertex_txt = matrix_folder + "/vetex.txt";
+  std::string matrix_txt = matrix_folder + "/matrix.txt";
+
+  int n = 0;
+  {
+    std::ifstream m_file(n_data_txt);
+    m_file >> n;
+  }
+
+  std::vector<DataSet> out;
+  std::ifstream col_file(col_txt);
+  std::ifstream col_group_file(col_group_txt);
+  std::ifstream row_file(row_txt);
+  std::ifstream vertex_file(vertex_txt);
+  std::ifstream matrix_file(matrix_txt);
   for (int k = 0; k < n; ++k) {
     DataSet dataset;
-    file >> dataset.vertex_num;
-    file >> dataset.total_dl_matrix_row_num;
-    file >> dataset.total_dl_matrix_col_num;
+    col_file >> dataset.total_dl_matrix_col_num;
+    row_file >> dataset.total_dl_matrix_row_num;
+    vertex_file >> dataset.vertex_num;
 
     int nm = dataset.total_dl_matrix_row_num * dataset.total_dl_matrix_col_num;
-
     dataset.dl_matrix.resize(nm);
     dataset.next_col.resize(nm);
     dataset.next_row.resize(nm);
     dataset.col_group.resize(dataset.total_dl_matrix_col_num, 0);
 
-    file >> matrix_file;
-    file >> col_file;
-    {
-      //   std::cout << "matrix_file: " << matrix_file << std::endl;
-      std::ifstream m_file(matrix_file);
-      for (int i = 0; i < dataset.total_dl_matrix_row_num; ++i) {
-        for (int j = 0; j < dataset.total_dl_matrix_col_num; ++j) {
-          m_file >> dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j];
-        }
-      }
+    for (int i = 0; i < dataset.total_dl_matrix_col_num; ++i) {
+      col_group_file >> dataset.col_group[i];
     }
-    {
-      //   std::cout << "col_file: " << col_file << std::endl;
-      std::ifstream m_file(col_file);
-      for (int i = 0; i < dataset.total_dl_matrix_col_num; ++i) {
-        m_file >> dataset.col_group[i];
+
+    for (int i = 0; i < dataset.total_dl_matrix_row_num; ++i) {
+      for (int j = 0; j < dataset.total_dl_matrix_col_num; ++j) {
+        matrix_file >>
+            dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j];
       }
     }
 
@@ -60,9 +66,9 @@ std::vector<DataSet> ReadDataSet(const std::string &cofig_file) {
       }
     }
 
-    datasets.push_back(dataset);
+    out.push_back(dataset);
   }
-  return datasets;
+  return out;
 }
 
 DataSets CombineDatasets(const std::vector<DataSet> &dataset) {

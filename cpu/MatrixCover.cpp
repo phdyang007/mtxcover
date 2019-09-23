@@ -45,7 +45,7 @@ bool check_existance_of_candidate_rows(int *deleted_rows, int *row_group,
                                        int search_depth,
                                        int total_dl_matrix_row_num) {
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    // std::cout<<deleted_rows[i]<<' '<<row_group[i]<<std::endl;
+    // std::cout << deleted_rows[i] << ' ' << row_group[i] << std::endl;
     if (deleted_rows[i] == 0 && row_group[i] == search_depth) {
       // std::cout<<"Candidate Row Found...."<<std::endl;
       return true;
@@ -200,7 +200,6 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
 #endif
 
   for (search_depth = 1; search_depth <= vertex_num;) {
-
 #ifndef BENCHMARK
     std::cout << "Deleted Cols" << std::endl;
     print_vec(deleted_cols, total_dl_matrix_col_num);

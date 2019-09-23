@@ -175,26 +175,27 @@ __device__ void get_conflict_col(int *dl_matrix, int *deleted_rows,
 
   int idxa = 0;
   int idxb = 0;
+
   for (int i = threadIdx.x; i < total_dl_matrix_row_num; i = i + blockDim.x) {
     // find the conflict edge that connects current node and the most closest
     // node.
-    if (deleted_rows[i]==-conflict_node_id){
+    if (deleted_rows[i] == -conflict_node_id) {
       idxa = i;
-    }
-    if (row_group[i] == search_depth + 1 &&
-        deleted_rows[i] == conflict_node_id) {
+    } else if (row_group[i] == search_depth + 1 &&
+               deleted_rows[i] == conflict_node_id) {
       idxb = i;
     }
-
   }
   __syncthreads();
-  for (int j=threadIdx.x; j < total_dl_matrix_col_num - vertex_num; j = j + blockDim.x) {
-    if(dl_matrix[idxa*total_dl_matrix_col_num + total_dl_matrix_col_num-j] ==
-       dl_matrix[idxb*total_dl_matrix_col_num + total_dl_matrix_col_num-j] && deleted_cols[j]>0) {
-         atomicMin(conflict_col_id, j);
-       }
+  for (int j = threadIdx.x; j < total_dl_matrix_col_num - vertex_num;
+       j = j + blockDim.x) {
+    if (dl_matrix[idxa * total_dl_matrix_col_num + total_dl_matrix_col_num -
+                  j] == dl_matrix[idxb * total_dl_matrix_col_num +
+                                  total_dl_matrix_col_num - j] &&
+        deleted_cols[j] > 0) {
+      atomicMin(conflict_col_id, j);
+    }
   }
-
 
   __syncthreads();
 }

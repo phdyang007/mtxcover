@@ -1,23 +1,13 @@
 # How To Use the benchmark
 
 1. Prepare the data
-  - Prepare the matrix file and the col name file, save them separately
-2. Write a test case config file, Here are the format
-```
-N_TEST_CASE
-N_VERTEX_IN_TEST_CASE_1
-N_ROW_IN_TEST_CASE_1 N_COL_IN_TEST_CASE_1
-FILE_PATH_TO_THE_MATRIX_FILE_IN_TEST_CASE_1
-FILE_PATH_TO_THE_COL_FILE_IN_TEST_CASE_1
-
-...
-
-N_VERTEX_IN_TEST_CASE_N
-N_ROW_IN_TEST_CASE_N N_COL_IN_TEST_CASE_N
-FILE_PATH_TO_THE_MATRIX_FILE_IN_TEST_CASE_N
-FILE_PATH_TO_THE_COL_FILE_IN_TEST_CASE_N
-```
-
-3. Use the config. Add the test_config file to the `test_configs` vector in `benchmark/benchmark.cc`
-4. `make`
-5. `./build/benchmark.bin`
+  - Can look at the example in `matrix` folder.
+  - The `n_data.txt` is the number of matrix
+  - The `col_cnt.txt` is the number of col
+  - The `row_cnt.txt` is the number of row
+  - The `col.txt` is the column name group
+  - The `vertex.txt` is the number of vertex
+  - The `matrix.txt` is the dl matrix
+2. `make`
+3. `./build/benchmark.bin`
+4. Can select another testing dataset by adding to the `test_configs` in the `benchmark.cc`
