@@ -48,13 +48,18 @@ __global__ void get_conflict_node_id(int *deleted_rows, int *row_group,
                                      int *conflict_node_id,
                                      const int total_dl_matrix_row_num);
 
-__global__ void get_conflict_col(int *dl_matrix, int *deleted_rows,
+__global__ void get_conflict_edge(int *dl_matrix, int *deleted_rows,
                                  int *deleted_cols, int *row_group,
                                  const int conflict_node_id,
-                                 const int search_depth, int *conflict_col_id,
+                                 const int search_depth, int *conflict_edge,
                                  const int vertex_num,
                                  const int total_dl_matrix_row_num,
                                  const int total_dl_matrix_col_num);
+                                 
+__global__ void get_conflict_col_id(int *dl_matrix, int *deleted_cols, int* conflict_col_id,
+                                    int *conflict_edge, int total_dl_matrix_col_num, 
+                                    int vertex_num);
+
 
 __global__ void remove_cols(int *deleted_cols, int *col_group,
                             const int conflict_col_id,
