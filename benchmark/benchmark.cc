@@ -28,46 +28,41 @@ int main(int argc, char *argv[]) {
   for (int i = 0; i < n; ++i) {
     const auto &tdataset = test_datasets[i];
     const auto &vset = validation_sets[i];
+    std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
+
     std::cout << "\n========================\n";
 
     // CPU
     std::cout << "\n>>> DataSet: " << tdataset << std::endl;
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
-      std::vector<DataSet> dataset =
-          ReadDataSetFromMatrixFolder(tdataset, vset);
+      double core_ns = 0;
       for (auto &ds : dataset) {
         auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
-
-        std::cout << "> Core Used NS: " << std::to_string(timer.GetCoreUsedNs())
-                  << std::endl;
-        std::cout << "> Load to GPU Used NS: "
-                  << std::to_string(timer.GetDataLoadingNs()) << std::endl;
-
+        core_ns += timer.GetCoreUsedNs();
         if (validate) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
       }
+      std::cout << "> Core Used NS: " << std::to_string(core_ns) << std::endl;
     }
 
     // GPU
     std::cout << "\n>>> DataSet: " << tdataset << std::endl;
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
-      std::vector<DataSet> dataset =
-          ReadDataSetFromMatrixFolder(tdataset, vset);
+      double core_ns = 0;
+
       for (auto &ds : dataset) {
         auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
-
-        std::cout << "> Core Used NS: " << std::to_string(timer.GetCoreUsedNs())
-                  << std::endl;
-        std::cout << "> Load to GPU Used NS: "
-                  << std::to_string(timer.GetDataLoadingNs()) << std::endl;
-
+        core_ns += timer.GetCoreUsedNs();
+        // std::cout << "> Load to GPU Used NS: "
+        //           << std::to_string(timer.GetDataLoadingNs()) << std::endl;
         if (validate) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
       }
+      std::cout << "> Core Used NS: " << std::to_string(core_ns) << std::endl;
     }
 
     // GPU_MG
@@ -75,8 +70,6 @@ int main(int argc, char *argv[]) {
     std::cout << "\n>>> DataSet: " << tdataset << std::endl;
     {
       std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
-      std::vector<DataSet> dataset =
-          ReadDataSetFromMatrixFolder(tdataset, vset);
       DataSets datasets = CombineDatasets(dataset);
       auto timer = Invoke(ImplVersion::ORIGINAL_GPU_MG, false, &datasets);
 
