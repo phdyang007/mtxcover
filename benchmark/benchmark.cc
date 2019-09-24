@@ -33,7 +33,8 @@ int main(int argc, char *argv[]) {
     std::cout << "\n========================\n";
 
     // CPU
-    std::cout << "\n>>> DataSet: " << tdataset << std::endl;
+    std::cout << "\n>>> DataSet: " << tdataset
+              << "    Matrix Count: " << dataset.size() << std::endl;
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
       double core_ns = 0;
@@ -48,7 +49,6 @@ int main(int argc, char *argv[]) {
     }
 
     // GPU
-    std::cout << "\n>>> DataSet: " << tdataset << std::endl;
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
       double core_ns = 0;
@@ -66,8 +66,6 @@ int main(int argc, char *argv[]) {
     }
 
     // GPU_MG
-
-    std::cout << "\n>>> DataSet: " << tdataset << std::endl;
     {
       std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
       DataSets datasets = CombineDatasets(dataset);
