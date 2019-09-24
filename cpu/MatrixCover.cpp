@@ -184,8 +184,8 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
   int selected_row_id_in_previous_search;
   int conflict_node_id;
   int conflict_col_id;
-  int hard_conflict_threshold = 2;
-  char tmp;
+  int hard_conflict_threshold = 500;
+
   // init lots of vectors
   init_vectors(conflict_count, total_dl_matrix_col_num);
   init_vectors(deleted_cols, total_dl_matrix_col_num);
@@ -196,6 +196,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
                        total_dl_matrix_row_num);
 
 #ifndef BENCHMARK
+  char tmp;
   print_vec(row_group, total_dl_matrix_row_num);
   print_vec(col_group, total_dl_matrix_col_num);
 #endif
