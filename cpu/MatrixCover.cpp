@@ -143,7 +143,8 @@ int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
     //}
   }
   for (int j = total_dl_matrix_col_num - 1; j > vertex_num; j--) {
-    if (dl_matrix[idxa][j] == dl_matrix[idxb][j] && deleted_cols[j] > 0) {
+    if (dl_matrix[idxa][j] == dl_matrix[idxb][j] && 
+    deleted_cols[j] > 0 && dl_matrix[idxa][j]==1) {
       conflict_col_id = j;
       break;
     }

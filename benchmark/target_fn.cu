@@ -215,7 +215,9 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   int *next_col_gpu;
   int *next_row_gpu;
   int *results_gpu;
+  int *conflict_edge_gpu;
   cudaMalloc(&dl_matrix_gpu, sizeof(int) * total_matrix);
+  cudaMalloc(&conflict_edge_gpu, sizeof(int) * 2*n);
   cudaMalloc(&next_col_gpu, sizeof(int) * total_matrix);
   cudaMalloc(&next_row_gpu, sizeof(int) * total_matrix);
   cudaMemcpy(dl_matrix_gpu, datasets->dl_matrix.data(),
@@ -293,13 +295,14 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
 
   cudaDeviceSynchronize();
   timer.StartCoreTime();
-  gpu_mg::mc_solver<<<n, thread_size>>>(
+  cudaDeviceSynchronize();
+  gpu_mg::mc_solver<<<1, 1>>>(
       dl_matrix_gpu, next_col_gpu, next_row_gpu, results_gpu, deleted_cols_gpu,
       deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
       vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
       offset_col_gpu, offset_row_gpu, offset_matrix_gpu, search_depth_gpu,
       selected_row_id_gpu, current_conflict_count_gpu, conflict_node_id_gpu,
-      conflict_col_id_gpu, existance_of_candidate_rows_gpu, n,
+      conflict_col_id_gpu, existance_of_candidate_rows_gpu, conflict_edge_gpu, n,
       hard_conflict_threshold);
   cudaDeviceSynchronize();
   timer.EndCoreTime();
@@ -362,6 +365,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   cudaFree(conflict_col_id_gpu);
   cudaFree(conflict_node_id_gpu);
   cudaFree(existance_of_candidate_rows_gpu);
+  cudaFree(conflict_edge_gpu);
   return timer;
 }
 

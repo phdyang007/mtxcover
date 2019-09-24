@@ -179,8 +179,9 @@ __global__ void get_conflict_edge(int *dl_matrix, int *deleted_rows,
   __syncthreads();
 }
 
-__global__ void get_conflict_col_id(int *dl_matrix, int *deleted_cols, int *conflict_col_id, 
-                                    int *conflict_edge, int total_dl_matrix_col_num, int vertex_num){
+__global__ void get_conflict_col_id(int *dl_matrix, int *deleted_cols, 
+                                    int *conflict_col_id, int *conflict_edge, 
+                                    int total_dl_matrix_col_num, int vertex_num){
   //if(threadIdx.x==0){
   //  printf("conflict edge a %d edge b %d\n",conflict_edge[0],conflict_edge[1]);
  // }
