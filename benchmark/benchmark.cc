@@ -62,7 +62,6 @@ int main(int argc, char *argv[]) {
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
       double core_ns = 0;
-      std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
       for (auto &ds : dataset) {
         auto timer = Invoke(ImplVersion::ORIGINAL_GPU, true, &ds);
         core_ns += timer.GetCoreUsedNs();

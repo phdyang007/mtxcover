@@ -159,6 +159,7 @@ MeasureTimer Invoke_ORIGINAL_GPU(DataSet *dataset, bool print_result) {
              cudaMemcpyDeviceToHost);
   cudaMemcpy(deleted_cols.data(), deleted_cols_gpu,
              sizeof(int) * total_dl_matrix_col_num, cudaMemcpyDeviceToHost);
+  dataset->final_result.clear();
   for (int i = 0; i < total_row; i++) {
     if (results[i] > 0) {
       dataset->final_result.push_back(i + 1);
@@ -310,7 +311,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   std::vector<int> results(total_row, 0);
   cudaMemcpy(results.data(), results_gpu, sizeof(int) * total_row,
              cudaMemcpyDeviceToHost);
-
+  datasets->final_result.clear();
   for (int k = 0; k < n; k++) {
     for (int i = 0; i < datasets->total_dl_matrix_row_num[k]; i++) {
       if (results[datasets->offset_row[k] + i] > 0) {
