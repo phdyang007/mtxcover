@@ -5,6 +5,15 @@
 #include "target_fn.h"
 
 std::vector<std::string> test_datasets = {
+    "../matrix/s1", 
+};
+
+std::vector<std::string> validation_sets = {
+    "../dlresults/s1.txt",
+};
+
+/*
+std::vector<std::string> test_datasets = {
     "../matrix/s1", "../matrix/s2", "../matrix/s3",  "../matrix/s4",
     "../matrix/s5", "../matrix/c1", "../matrix/c2",  "../matrix/c3",
     "../matrix/c4", "../matrix/c5", "../matrix/c6",  "../matrix/c7",
@@ -18,6 +27,7 @@ std::vector<std::string> validation_sets = {
     "../dlresults/c5.txt", "../dlresults/c6.txt", "../dlresults/c7.txt",
     "../dlresults/c8.txt", "../dlresults/c9.txt", "../dlresults/c10.txt",
 };
+*/
 
 int main(int argc, char *argv[]) {
   bool validate = true;
@@ -52,9 +62,9 @@ int main(int argc, char *argv[]) {
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
       double core_ns = 0;
-
+      std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
       for (auto &ds : dataset) {
-        auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
+        auto timer = Invoke(ImplVersion::ORIGINAL_GPU, true, &ds);
         core_ns += timer.GetCoreUsedNs();
         // std::cout << "> Load to GPU Used NS: "
         //           << std::to_string(timer.GetDataLoadingNs()) << std::endl;
