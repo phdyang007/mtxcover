@@ -6,11 +6,11 @@ basic.o: common.h data_reader.h data_reader.cc
 
 target_fn.a: common.h target_fn.cu target_fn.h ../gpu/MatrixCoverGPU.cu ../gpu-mg/MatrixCoverGPU.cu
 	mkdir -p build
-	nvcc -c -O2 -arch=sm_35 -std=c++11 -rdc=true -I../gpu \
+	nvcc -c -O2 -arch=sm_35 -std=c++11 -rdc=false -I../gpu \
 		../gpu/MatrixCoverGPU.cu -DBENCHMARK -o build/gpu_cover.o
-	nvcc -c -O2 -arch=sm_35 -std=c++11 -rdc=true -I../gpu-mg \
+	nvcc -c -O2 -arch=sm_35 -std=c++11 -rdc=false -I../gpu-mg \
 		../gpu-mg/MatrixCoverGPU.cu -DBENCHMARK -o build/gpu_mg_cover.o
-	nvcc -c -O2 -arch=sm_35 -std=c++11 -rdc=true \
+	nvcc -c -O2 -arch=sm_35 -std=c++11 -rdc=false \
 		target_fn.cu -o build/target_fn.o
 	gcc -c -O2 -std=c++11 -I../cpu ../cpu/MatrixCover.cpp \
 		-DBENCHMARK -o build/cpu_matrix_cover.o
@@ -20,6 +20,6 @@ target_fn.a: common.h target_fn.cu target_fn.h ../gpu/MatrixCoverGPU.cu ../gpu-m
 
 benchmark.bin: basic.o target_fn.a
 	mkdir -p build
-	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=true build/target_fn.a build/basic.o	\
+	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
 		 -lcudadevrt benchmark.cc -o build/benchmark.bin
 

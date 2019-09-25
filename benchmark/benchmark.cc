@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
       double core_ns = 0;
       int j = 0;
       for (auto &ds : dataset) {
-        j++;
+        //j++;
         if(j!=debug_graph){continue;}
         //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
         auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
@@ -99,10 +99,8 @@ int main(int argc, char *argv[]) {
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
       double core_ns = 0;
-      std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
-      int j = 0;
       for (auto &ds : dataset) {
-        j++;
+        //j++;
         //if(j!=debug_graph){continue;}
         //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
         auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);

@@ -3,7 +3,7 @@
 #include "../cpu/MatrixCover.h"
 #include "../gpu-mg/MatrixCoverGPU.cuh"
 #include "../gpu/MatrixCoverGPU.cuh"
-#include <cuda_profiler_api.h>
+
 // struct DataSets {
 //     int graph_count;
 //     std::vector<int> total_dl_matrix_row_num[2]={276,276};
@@ -167,6 +167,7 @@ MeasureTimer Invoke_ORIGINAL_GPU(DataSet *dataset, bool print_result) {
              cudaMemcpyDeviceToHost);
   cudaMemcpy(deleted_cols.data(), deleted_cols_gpu,
              sizeof(int) * total_dl_matrix_col_num, cudaMemcpyDeviceToHost);
+  dataset->final_result.clear();
   for (int i = 0; i < total_row; i++) {
     if (results[i] > 0) {
       //std::cout<<"debug"<<dataset->final_result.empty()<<std::endl;
@@ -311,7 +312,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   cudaDeviceSynchronize();
   timer.StartCoreTime();
  
-  cudaProfilerStart();
+
   gpu_mg::mc_solver<<<1, 1>>>(
       dl_matrix_gpu, next_col_gpu, next_row_gpu, results_gpu, deleted_cols_gpu,
       deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
@@ -321,13 +322,13 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
       conflict_col_id_gpu, existance_of_candidate_rows_gpu, conflict_edge_gpu, max_gpu, n,
       hard_conflict_threshold);
   cudaDeviceSynchronize();
-  cudaProfilerStop();
+
   timer.EndCoreTime();
 
   std::vector<int> results(total_row, 0);
   cudaMemcpy(results.data(), results_gpu, sizeof(int) * total_row,
              cudaMemcpyDeviceToHost);
-
+  datasets->final_result.clear();
   for (int k = 0; k < n; k++) {
     for (int i = 0; i < datasets->total_dl_matrix_row_num[k]; i++) {
       if (results[datasets->offset_row[k] + i] > 0) {
