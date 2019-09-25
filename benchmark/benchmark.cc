@@ -58,7 +58,9 @@ int main(int argc, char *argv[]) {
   int debug_file = 10;
   int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
-    if(i!=debug_file-1){continue;}
+    if (i != debug_file - 1) {
+      continue;
+    }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
@@ -100,7 +102,7 @@ int main(int argc, char *argv[]) {
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
 #endif
-    // GPU
+// GPU
 #ifdef GPU
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
@@ -113,7 +115,8 @@ int main(int argc, char *argv[]) {
         auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
         core_ns += timer.GetCoreUsedNs();
         // std::cout << "> Load to GPU Used NS: "
-        //           << std::to_string(timer.GetDataLoadingNs()) << std::endl;
+        //           << std::to_string(timer.GetDataLoadingNs()) <<
+        // std::endl;
         if (validate) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
@@ -122,7 +125,7 @@ int main(int argc, char *argv[]) {
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
 #endif
-    // GPU_MG
+// GPU_MG
 #ifdef GPUMG
     {
       std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
@@ -140,7 +143,7 @@ int main(int argc, char *argv[]) {
       }
     }
     std::cout << "========================\n\n\n";
-    #endif
+#endif
   }
 
   return 0;

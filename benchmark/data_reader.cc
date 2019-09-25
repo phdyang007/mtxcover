@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <fstream>
 
-
 std::vector<DataSet>
 ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
                             const std::string &result_txt) {
@@ -62,7 +61,8 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
     for (int i = 0; i < dataset.total_dl_matrix_row_num; ++i) {
       int last_col = dataset.total_dl_matrix_col_num;
       for (int j = dataset.total_dl_matrix_col_num - 1; j >= 0; --j) {
-        dataset.next_col[i * dataset.total_dl_matrix_col_num + j] = last_col;
+        dataset.next_col[i * dataset.total_dl_matrix_col_num + j] =
+            last_col - j;
         if (dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j] == 1) {
           last_col = j;
         }
@@ -71,7 +71,8 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
     for (int j = 0; j < dataset.total_dl_matrix_col_num; ++j) {
       int last_row = dataset.total_dl_matrix_row_num;
       for (int i = dataset.total_dl_matrix_row_num - 1; i >= 0; --i) {
-        dataset.next_row[j * dataset.total_dl_matrix_row_num + i] = last_row;
+        dataset.next_row[j * dataset.total_dl_matrix_row_num + i] =
+            last_row - i;
         if (dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j] == 1) {
           last_row = i;
         }

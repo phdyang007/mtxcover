@@ -155,13 +155,13 @@ MeasureTimer Invoke_ORIGINAL_GPU(DataSet *dataset, bool print_result) {
   timer.EndDataLoadTime();
 
   timer.StartCoreTime();
-  // cudaProfilerStart();
+  cudaProfilerStart();
   gpu::mc_solver(dl_matrix_gpu, results_gpu, deleted_cols_gpu, deleted_rows_gpu,
                  col_group_gpu, row_group_gpu, conflict_count_gpu,
                  vertex_num_gpu, total_dl_matrix_row_num_gpu,
                  total_dl_matrix_col_num_gpu);
   cudaDeviceSynchronize();
-  // cudaProfilerStop();
+  cudaProfilerStop();
 
   timer.EndCoreTime();
 
@@ -314,8 +314,8 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   cudaDeviceSynchronize();
   timer.StartCoreTime();
 
-  // cudaProfilerStart();
-  gpu_mg::mc_solver<<<1, 1>>>(
+  cudaProfilerStart();
+  gpu_mg::mc_solver<<<total_matrix, thread_size>>>(
       dl_matrix_gpu, next_col_gpu, next_row_gpu, results_gpu, deleted_cols_gpu,
       deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
       vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
@@ -324,7 +324,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
       conflict_col_id_gpu, existance_of_candidate_rows_gpu, conflict_edge_gpu,
       max_gpu, n, hard_conflict_threshold);
   cudaDeviceSynchronize();
-  // cudaProfilerStop();
+  cudaProfilerStop();
 
   timer.EndCoreTime();
 
