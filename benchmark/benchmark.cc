@@ -55,10 +55,10 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 2;
+  int debug_file = 10;
   int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
-    // if(i!=debug_file-1){continue;}
+    if(i!=debug_file-1){continue;}
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
     // CPU
     std::cout << "\n>>> DataSet: " << tdataset
               << "    Matrix Count: " << dataset.size() << std::endl;
+#ifdef CPU
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
       double core_ns = 0;
@@ -98,7 +99,9 @@ int main(int argc, char *argv[]) {
       std::cout << "> Core Used NS: " << std::to_string(core_ns)
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
+#endif
     // GPU
+#ifdef GPU
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
       double core_ns = 0;
@@ -118,8 +121,9 @@ int main(int argc, char *argv[]) {
       std::cout << "> Core Used NS: " << std::to_string(core_ns)
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
-
+#endif
     // GPU_MG
+#ifdef GPUMG
     {
       std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
       DataSets datasets = CombineDatasets(dataset);
@@ -136,6 +140,8 @@ int main(int argc, char *argv[]) {
       }
     }
     std::cout << "========================\n\n\n";
+    #endif
   }
+
   return 0;
 }

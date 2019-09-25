@@ -1,4 +1,4 @@
-all: basic.o target_fn.a benchmark.bin
+all: cpu.bin gpu.bin gpumg.bin
 
 basic.o: common.h data_reader.h data_reader.cc
 	mkdir -p build
@@ -18,8 +18,21 @@ target_fn.a: common.h target_fn.cu target_fn.h ../gpu/MatrixCoverGPU.cu ../gpu-m
 		build/gpu_cover.o build/target_fn.o \
 		build/cpu_matrix_cover.o
 
-benchmark.bin: basic.o target_fn.a
+cpu.bin: basic.o target_fn.a
 	mkdir -p build
 	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
-		 -lcudadevrt benchmark.cc -o build/benchmark.bin
+		 -lcudadevrt benchmark.cc -DCPU -o  build/$@
 
+gpu.bin: basic.o target_fn.a
+	mkdir -p build
+	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
+		 -lcudadevrt benchmark.cc -DGPU -o build/$@
+
+gpumg.bin: basic.o target_fn.a
+	mkdir -p build
+	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
+		 -lcudadevrt benchmark.cc -DGPUMG -o build/$@
+
+
+clean:
+	rm -rf build
