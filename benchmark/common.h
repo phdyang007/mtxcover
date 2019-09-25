@@ -6,7 +6,6 @@
 #include <iostream>
 #include <vector>
 
-
 using clock_type = std::chrono::high_resolution_clock;
 
 struct DataSet {

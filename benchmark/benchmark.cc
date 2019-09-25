@@ -1,11 +1,13 @@
-#include <cstring>
-#include <fstream>
 #include "common.h"
 #include "data_reader.h"
 #include "target_fn.h"
+#include <cstring>
+#include <fstream>
+#include <thread>
+
 /*
 std::vector<std::string> test_datasets = {
-    "../matrix/c1", 
+    "../matrix/c1",
 };
 
 std::vector<std::string> validation_sets = {
@@ -54,9 +56,9 @@ int main(int argc, char *argv[]) {
   }
   int n = test_datasets.size();
   int debug_file = 2;
-  int debug_graph= 1691;
+  int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
-    //if(i!=debug_file-1){continue;}
+    // if(i!=debug_file-1){continue;}
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
@@ -64,7 +66,6 @@ int main(int argc, char *argv[]) {
     std::cout << "\n========================\n";
 
     // CPU
-    ///*
     std::cout << "\n>>> DataSet: " << tdataset
               << "    Matrix Count: " << dataset.size() << std::endl;
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
@@ -72,9 +73,12 @@ int main(int argc, char *argv[]) {
       double core_ns = 0;
       int j = 0;
       for (auto &ds : dataset) {
-        //j++;
-        if(j!=debug_graph){continue;}
-        //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
+        // j++;
+        // if (j != debug_graph) {
+        //   continue;
+        // }
+        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
+        // "<<j<<std::endl;
         auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
         core_ns += timer.GetCoreUsedNs();
         if (validate) {
@@ -82,27 +86,27 @@ int main(int argc, char *argv[]) {
         }
         if (dumpout) {
           std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
-          if(of.is_open()){
-              for(int i=0; i<ds.final_result.size(); i++){
-                  of<<ds.final_result[i]<<' ';
-              }
+          if (of.is_open()) {
+            for (int i = 0; i < ds.final_result.size(); i++) {
+              of << ds.final_result[i] << ' ';
+            }
           }
-          of<<std::endl;
+          of << std::endl;
           of.close();
         }
       }
-      std::cout << "> Core Used NS: " << std::to_string(core_ns) << std::endl;
+      std::cout << "> Core Used NS: " << std::to_string(core_ns)
+                << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
-    //*/
     // GPU
-    ///*
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
       double core_ns = 0;
       for (auto &ds : dataset) {
-        //j++;
-        //if(j!=debug_graph){continue;}
-        //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
+        // j++;
+        // if(j!=debug_graph){continue;}
+        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
+        // "<<j<<std::endl;
         auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
         core_ns += timer.GetCoreUsedNs();
         // std::cout << "> Load to GPU Used NS: "
@@ -111,17 +115,18 @@ int main(int argc, char *argv[]) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
       }
-      std::cout << "> Core Used NS: " << std::to_string(core_ns) << std::endl;
+      std::cout << "> Core Used NS: " << std::to_string(core_ns)
+                << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
-    //*/
+
     // GPU_MG
-    ///*
     {
       std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
       DataSets datasets = CombineDatasets(dataset);
       auto timer = Invoke(ImplVersion::ORIGINAL_GPU_MG, false, &datasets);
 
       std::cout << "> Core Used NS: " << std::to_string(timer.GetCoreUsedNs())
+                << "   s:" << std::to_string(timer.GetCoreUsedNs() * 10e-10)
                 << std::endl;
       std::cout << "> Load to GPU Used NS: "
                 << std::to_string(timer.GetDataLoadingNs()) << std::endl;
@@ -130,7 +135,6 @@ int main(int argc, char *argv[]) {
         ValidateArray(datasets.expected_result, datasets.final_result);
       }
     }
-    //*/
     std::cout << "========================\n\n\n";
   }
   return 0;
