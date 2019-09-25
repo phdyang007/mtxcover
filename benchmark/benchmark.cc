@@ -1,18 +1,19 @@
 #include <cstring>
-
+#include <fstream>
 #include "common.h"
 #include "data_reader.h"
 #include "target_fn.h"
-
+/*
 std::vector<std::string> test_datasets = {
-    "../matrix/s1", 
+    "../matrix/c1", 
 };
 
 std::vector<std::string> validation_sets = {
-    "../dlresults/s1.txt",
+    "../dlresults/c1.txt",
 };
 
-/*
+*/
+///*
 std::vector<std::string> test_datasets = {
     "../matrix/s1", "../matrix/s2", "../matrix/s3",  "../matrix/s4",
     "../matrix/s5", "../matrix/c1", "../matrix/c2",  "../matrix/c3",
@@ -27,44 +28,84 @@ std::vector<std::string> validation_sets = {
     "../dlresults/c5.txt", "../dlresults/c6.txt", "../dlresults/c7.txt",
     "../dlresults/c8.txt", "../dlresults/c9.txt", "../dlresults/c10.txt",
 };
-*/
+
+std::vector<std::string> cpu_results = {
+    "../cpuresults/s1.txt", "../cpuresults/s2.txt", "../cpuresults/s3.txt",
+    "../cpuresults/s4.txt", "../cpuresults/s5.txt", "../cpuresults/c1.txt",
+    "../cpuresults/c2.txt", "../cpuresults/c3.txt", "../cpuresults/c4.txt",
+    "../cpuresults/c5.txt", "../cpuresults/c6.txt", "../cpuresults/c7.txt",
+    "../cpuresults/c8.txt", "../cpuresults/c9.txt", "../cpuresults/c10.txt",
+};
+
+std::vector<std::string> gpu_results = {
+    "../gpuresults/s1.txt", "../gpuresults/s2.txt", "../gpuresults/s3.txt",
+    "../gpuresults/s4.txt", "../gpuresults/s5.txt", "../gpuresults/c1.txt",
+    "../gpuresults/c2.txt", "../gpuresults/c3.txt", "../gpuresults/c4.txt",
+    "../gpuresults/c5.txt", "../gpuresults/c6.txt", "../gpuresults/c7.txt",
+    "../gpuresults/c8.txt", "../gpuresults/c9.txt", "../gpuresults/c10.txt",
+};
+//*/
 
 int main(int argc, char *argv[]) {
-  bool validate = true;
+  bool validate = false;
+  bool dumpout = false;
   if (argc >= 2) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
+  int debug_file = 2;
+  int debug_graph= 1691;
   for (int i = 0; i < n; ++i) {
+    //if(i!=debug_file-1){continue;}
     const auto &tdataset = test_datasets[i];
-    const auto &vset = validation_sets[i];
+    const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
 
     std::cout << "\n========================\n";
 
     // CPU
+    ///*
     std::cout << "\n>>> DataSet: " << tdataset
               << "    Matrix Count: " << dataset.size() << std::endl;
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
       double core_ns = 0;
+      int j = 0;
       for (auto &ds : dataset) {
+        j++;
+        if(j!=debug_graph){continue;}
+        //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
         auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
         core_ns += timer.GetCoreUsedNs();
         if (validate) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
+        if (dumpout) {
+          std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
+          if(of.is_open()){
+              for(int i=0; i<ds.final_result.size(); i++){
+                  of<<ds.final_result[i]<<' ';
+              }
+          }
+          of<<std::endl;
+          of.close();
+        }
       }
       std::cout << "> Core Used NS: " << std::to_string(core_ns) << std::endl;
     }
-
+    //*/
     // GPU
+    ///*
     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
     {
       double core_ns = 0;
       std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
+      int j = 0;
       for (auto &ds : dataset) {
-        auto timer = Invoke(ImplVersion::ORIGINAL_GPU, true, &ds);
+        j++;
+        //if(j!=debug_graph){continue;}
+        //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
+        auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
         core_ns += timer.GetCoreUsedNs();
         // std::cout << "> Load to GPU Used NS: "
         //           << std::to_string(timer.GetDataLoadingNs()) << std::endl;
@@ -74,8 +115,9 @@ int main(int argc, char *argv[]) {
       }
       std::cout << "> Core Used NS: " << std::to_string(core_ns) << std::endl;
     }
-
+    //*/
     // GPU_MG
+    ///*
     {
       std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
       DataSets datasets = CombineDatasets(dataset);
@@ -90,7 +132,7 @@ int main(int argc, char *argv[]) {
         ValidateArray(datasets.expected_result, datasets.final_result);
       }
     }
-
+    //*/
     std::cout << "========================\n\n\n";
   }
   return 0;
