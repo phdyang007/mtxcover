@@ -16,8 +16,12 @@ __device__ void delete_rows_and_columns(int *dl_matrix, int *deleted_rows,
 
 __device__ void init_vectors(int *vec, const int vec_length);
 
-__device__ void get_largest_value(int *vec, int *conflict_col_id,
-                                  const int vec_length, const int max = 0);
+__device__ void get_largest_value(int *vec,
+                                  const int vec_length, int* max = 0);
+
+__device__ void find_index(int *vec, const int vec_length, int *value, int *index);
+
+              
 
 __device__ void init_vectors_reserved(int *vec, const int vec_length);
 
@@ -73,6 +77,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
           int *offset_matrix, int *search_depth, int *selected_row_id,
           int *current_conflict_count, int *conflict_node_id,
           int *conflict_col_id, int *existance_of_candidate_rows, int* conflict_edge,
+          int *max,
           const int graph_count, const int hard_conflict_threshold);
 // void mc_solver(int* dl_matrix, int* results, int* deleted_cols, int*
 // deleted_rows, int* col_group,int* row_group, int* conflict_count,	const

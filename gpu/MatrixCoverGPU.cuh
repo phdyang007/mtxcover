@@ -15,8 +15,10 @@ __global__ void delete_rows_and_columns(int *dl_matrix, int *deleted_rows,
 
 __global__ void init_vectors(int *vec, const int vec_length);
 
-__global__ void get_largest_value(int *vec, int *conflict_col_id,
-                                  const int vec_length, const int max = 0);
+__global__ void get_largest_value(int *vec, 
+    const int vec_length, int* max);
+
+__global__ void find_index(int *vec, const int vec_length, int *value, int *index);
 
 __global__ void init_vectors_reserved(int *vec, const int vec_length);
 
