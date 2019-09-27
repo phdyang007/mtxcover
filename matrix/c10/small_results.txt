@@ -1,0 +1,23 @@
+bench/sim_c10.gds DL
+, comp_id: 2, sub_comp_id: 0,num_vertices(sg) 17, obj_value: 0.1
+, comp_id: 148, sub_comp_id: 0,num_vertices(sg) 13, obj_value: 0.1
+, comp_id: 189, sub_comp_id: 0,num_vertices(sg) 9, obj_value: 0.1
+, comp_id: 286, sub_comp_id: 1,num_vertices(sg) 14, obj_value: 0.1
+, comp_id: 296, sub_comp_id: 0,num_vertices(sg) 18, obj_value: 0.1
+, comp_id: 417, sub_comp_id: 0,num_vertices(sg) 13, obj_value: 0.1
+, comp_id: 451, sub_comp_id: 0,num_vertices(sg) 16, obj_value: 0.1
+, comp_id: 555, sub_comp_id: 0,num_vertices(sg) 9, obj_value: 0.1
+, comp_id: 611, sub_comp_id: 0,num_vertices(sg) 10, obj_value: 0.1
+, comp_id: 633, sub_comp_id: 0,num_vertices(sg) 14, obj_value: 0.1
+, comp_id: 691, sub_comp_id: 0,num_vertices(sg) 17, obj_value: 0.1
+, comp_id: 765, sub_comp_id: 1,num_vertices(sg) 12, obj_value: 0.1
+, comp_id: 804, sub_comp_id: 0,num_vertices(sg) 17, obj_value: 0.1
+, comp_id: 1055, sub_comp_id: 2,num_vertices(sg) 14, obj_value: 0.1
+, comp_id: 1218, sub_comp_id: 0,num_vertices(sg) 16, obj_value: 7
+, comp_id: 1247, sub_comp_id: 0,num_vertices(sg) 13, obj_value: 0.1
+, comp_id: 1331, sub_comp_id: 0,num_vertices(sg) 11, obj_value: 0.1
+, comp_id: 1390, sub_comp_id: 1,num_vertices(sg) 19, obj_value: 0.1
+, comp_id: 1485, sub_comp_id: 0,num_vertices(sg) 9, obj_value: 0.1
+, comp_id: 1664, sub_comp_id: 0,num_vertices(sg) 14, obj_value: 0.1
+, comp_id: 1702, sub_comp_id: 0,num_vertices(sg) 17, obj_value: 0.1
+, comp_id: 1704, sub_comp_id: 0,num_vertices(sg) 10, obj_value: 0.1

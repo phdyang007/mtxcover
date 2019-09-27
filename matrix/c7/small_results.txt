@@ -1,0 +1,10 @@
+bench/sim_c7.gds DL
+, comp_id: 42, sub_comp_id: 0,num_vertices(sg) 16, obj_value: 0.1
+, comp_id: 42, sub_comp_id: 1,num_vertices(sg) 17, obj_value: 0.1
+, comp_id: 43, sub_comp_id: 0,num_vertices(sg) 18, obj_value: 2
+, comp_id: 230, sub_comp_id: 0,num_vertices(sg) 10, obj_value: 0.1
+, comp_id: 236, sub_comp_id: 1,num_vertices(sg) 10, obj_value: 0.1
+, comp_id: 340, sub_comp_id: 0,num_vertices(sg) 13, obj_value: 0.1
+, comp_id: 532, sub_comp_id: 0,num_vertices(sg) 14, obj_value: 0.1
+, comp_id: 542, sub_comp_id: 0,num_vertices(sg) 16, obj_value: 0.1
+, comp_id: 684, sub_comp_id: 0,num_vertices(sg) 11, obj_value: 0.1

@@ -1,0 +1,4 @@
+bench/sim_c4.gds DL
+, comp_id: 22, sub_comp_id: 1,num_vertices(sg) 12, obj_value: 0.1
+, comp_id: 238, sub_comp_id: 1,num_vertices(sg) 24, obj_value: 0.1
+, comp_id: 268, sub_comp_id: 1,num_vertices(sg) 14, obj_value: 0.1

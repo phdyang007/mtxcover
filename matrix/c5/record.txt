@@ -1,5 +1,5 @@
 bench/sim_c5.gds DL
-color time 0.05s(46.8%), 0.11s real
-total time 0.11s(43.3%), 0.25s real
-Stitch number: 0
+color time 0.05s(49.2%), 0.10s real
+total time 0.10s(59.6%), 0.17s real
+Stitch number: 1
 Conflict number: 0

@@ -1,0 +1,2 @@
+bench/sim_c5.gds DL
+, comp_id: 329, sub_comp_id: 0,num_vertices(sg) 17, obj_value: 0.1
