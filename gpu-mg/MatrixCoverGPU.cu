@@ -265,31 +265,15 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
           int *conflict_col_id, int *existance_of_candidate_rows,
           int *conflict_edge, int *max, const int graph_count,
           const int hard_conflict_threshold) {
+  // // The Max Col Cnt is 131
+  // // The Max Row Cnt is 339
+  __shared__ int shared_deleted_cols[140];
+  __shared__ int shared_deleted_rows[340];
+  __shared__ int shared_conflict_count[140];
+  __shared__ int shared_result[340];
+  __shared__ int shared_row_group[340];
+  __shared__ int shared_col_group[140];
 
-  // to be refreshed if one conflict reaches many counts
-  /*
-  int search_depth = 0;
-  int *selected_row_id_gpu;
-  int vertex_num = vertex_num_gpu;
-  int total_dl_matrix_col_num=total_dl_matrix_col_num_gpu;
-  int total_dl_matrix_row_num=total_dl_matrix_row_num_gpu;
-  int current_conflict_count;
-  int *conflict_node_id_gpu;
-  int *conflict_col_id_gpu;
-  const int hard_conflict_threshold = 500;
-  int *existance_of_candidate_rows_gpu;
-  int *existance_of_candidate_rows=new int(0);
-  int *conflict_col_id=new int(0);
-  int *selected_row_id=new int(0);
-  int *conflict_node_id=new int(0);
-  cudaMalloc(&existance_of_candidate_rows_gpu, sizeof(int));
-  cudaMalloc(&selected_row_id_gpu, sizeof(int));
-  cudaMalloc(&conflict_node_id_gpu, sizeof(int));
-  cudaMalloc(&conflict_col_id_gpu, sizeof(int));
-
-  char brk;
-  */
-  // int k = blockDim.x;
   for (int k = blockIdx.x; k < graph_count; k += gridDim.x) {
     int t_cn = total_dl_matrix_col_num[k];
     int t_rn = total_dl_matrix_row_num[k];
@@ -322,6 +306,19 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
     __syncthreads();
     get_vertex_row_group(t_row_group, t_dl_matrix, vertex_num[k], t_rn, t_cn);
     __syncthreads();
+
+    for (int i = threadIdx.x; i < t_cn; i += blockDim.x) {
+      shared_deleted_cols[i] = t_deleted_cols[i];
+      shared_conflict_count[i] = t_conflict_count[i];
+      shared_col_group[i] = t_col_group[i];
+    }
+    for (int i = threadIdx.x; i < t_rn; i += blockDim.x) {
+      shared_deleted_rows[i] = t_deleted_rows[i];
+      shared_result[i] = t_results[i];
+      shared_row_group[i] = t_row_group[i];
+    }
+    __syncthreads();
+
     /*
     print_vec(deleted_cols+offset_col[k], t_cn);
     __syncthreads();
