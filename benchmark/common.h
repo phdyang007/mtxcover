@@ -75,12 +75,12 @@ template <typename T>
 void ValidateArray(const std::vector<T> &a, const std::vector<T> &b) {
   int an = a.size();
   int bn = b.size();
-  // std::cout << "expected n: " << an << "  final n: " << bn << std::endl;
+  std::cout << "expected n: " << an << "  final n: " << bn << std::endl;
   assert(an == bn);
-  // for (int i = 0; i < an; ++i) {
-  //   std::cout << a[i] << " <> " << b[i] << ", ";
-  // }
-  // std::cout << std::endl;
+  for (int i = 0; i < an; ++i) {
+    std::cout << a[i] << " <> " << b[i] << ", ";
+  }
+  std::cout << std::endl;
 
   for (int i = 0; i < an; ++i) {
     assert(a[i] == b[i]);

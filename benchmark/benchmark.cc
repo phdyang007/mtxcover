@@ -55,12 +55,12 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 10;
+  int debug_file = 9;
   int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
-    if (i != debug_file - 1) {
-      continue;
-    }
+    // if (i != debug_file - 1) {
+    //   continue;
+    // }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
