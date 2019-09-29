@@ -142,7 +142,7 @@ int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
     //  }
     //}
   }
-#ifndef BENCHMARK
+#ifdef BENCHMARK
   std::cout<< "conflict rows are"<<std::endl;
   print_vec(dl_matrix[idxa], total_dl_matrix_col_num);
   print_vec(dl_matrix[idxb], total_dl_matrix_col_num);
@@ -176,6 +176,12 @@ void print_vec(int *vec, int vec_length) {
 
 void print_matrix(int **mat, int row, int col) {
   for (int i = 0; i < row; i++) {
+    if (i < 10) {
+      std::cout << i << " : ";
+    } else {
+      std::cout << i << ": ";
+    }
+
     for (int j = 0; j < col; j++) {
       std::cout << mat[i][j] << ' ';
     }
@@ -212,7 +218,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
   get_vertex_row_group(row_group, dl_matrix, vertex_num,
                        total_dl_matrix_row_num);
 
-#ifndef BENCHMARK
+#ifdef BENCHMARK
   char tmp;
   print_vec(row_group, total_dl_matrix_row_num);
   print_vec(col_group, total_dl_matrix_col_num);
@@ -223,7 +229,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
     token=check_existance_of_candidate_rows(
             deleted_rows, row_group, search_depth,
             total_dl_matrix_row_num);
-#ifndef BENCHMARK
+#ifdef BENCHMARK
     std::cout << "Deleted Cols" << std::endl;
     print_vec(deleted_cols, total_dl_matrix_col_num);
     std::cout << "Deleted Rows" << std::endl;
@@ -242,7 +248,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
       selected_row_id =
           select_row(deleted_rows, row_group, search_depth,
                      total_dl_matrix_row_num); // select row and add to results
-#ifndef BENCHMARK
+#ifdef BENCHMARK
       std::cout << "selected id is " << selected_row_id << std::endl;
 #endif
       results[selected_row_id] = search_depth;
@@ -259,7 +265,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
 
     } else { // do backtrace
       search_depth--;
-#ifndef BENCHMARK
+#ifdef BENCHMARK
       std::cout << "search depth is" << search_depth << std::endl;
 #endif      
       if (search_depth > 0) {
@@ -270,7 +276,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
               dl_matrix, deleted_rows, deleted_cols, row_group, conflict_node_id,
               search_depth, vertex_num, total_dl_matrix_row_num,
               total_dl_matrix_col_num); // get conflict edge
-#ifndef BENCHMARK
+#ifdef BENCHMARK
           std::cout << "conflict node id is " << conflict_node_id << std::endl;
           std::cout << "conflict col id is " << conflict_col_id << std::endl;
           //if(conflict_col_id==0){std::cin>>tmp;}
@@ -325,7 +331,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
       }
     }
   }
-#ifndef BENCHMARK
+#ifdef BENCHMARK
   print_matrix(dl_matrix, total_dl_matrix_row_num, total_dl_matrix_col_num);
 #endif
   delete[] deleted_rows;

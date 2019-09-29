@@ -55,14 +55,14 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 10;
-  int debug_graph = 1691;
+  int debug_file = 2  ;
+  int debug_graph = 17;
   for (int i = 0; i < n; ++i) {
     if (i != debug_file - 1) {
       continue;
     }
     const auto &tdataset = test_datasets[i];
-    const auto &vset = cpu_results[i];
+    const auto &vset = validation_sets[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
 
     std::cout << "\n========================\n";
@@ -75,14 +75,15 @@ int main(int argc, char *argv[]) {
     {
       double core_ns = 0;
       int j = 0;
+      int conflict_count = 0;
       for (auto &ds : dataset) {
-        // j++;
-        // if (j != debug_graph) {
-        //   continue;
-        // }
-        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
-        // "<<j<<std::endl;
+        j++;
+        //if (j != debug_graph) {
+        //  continue;
+        //}
+        //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
         auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
+        conflict_count += ds.conflict_count;
         core_ns += timer.GetCoreUsedNs();
         if (validate) {
           ValidateArray(ds.expected_result, ds.final_result);
@@ -100,6 +101,7 @@ int main(int argc, char *argv[]) {
       }
       std::cout << "> Core Used NS: " << std::to_string(core_ns)
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
+      std::cout << "total conflict count is " << conflict_count << std::endl; 
     }
 #endif
 // GPU

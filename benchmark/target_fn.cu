@@ -21,7 +21,7 @@ MeasureTimer Invoke_ORIGINAL_CPU(DataSet *dataset, bool print_result) {
 
   int total_col = dataset->total_dl_matrix_col_num;
   int total_row = dataset->total_dl_matrix_row_num;
-
+  dataset->conflict_count = 0;
   std::vector<int> results(total_row, 0);
   std::vector<int> deleted_cols(total_col, 0);
   int **dl_matrix = new int *[total_row];
@@ -68,6 +68,7 @@ MeasureTimer Invoke_ORIGINAL_CPU(DataSet *dataset, bool print_result) {
     }
 
     std::cout << "Conflict Num is " << conflict_count / 3 << std::endl;
+    dataset->conflict_count = conflict_count /3;
   }
 
   for (int i = 0; i < total_row; i++) {

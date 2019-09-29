@@ -29,7 +29,7 @@ bench/sim_s5.gds DL
 , comp_id: 2306, sub_comp_id: 0,num_vertices(sg) 9, obj_value: 2
 , comp_id: 2399, sub_comp_id: 5,num_vertices(sg) 8, obj_value: 2
 , comp_id: 2416, sub_comp_id: 4,num_vertices(sg) 12, obj_value: 0.1
-, comp_id: 2424, sub_comp_id: 0,num_vertices(sg) 8, obj_value: 2
+, comp_id: 2424, sub_comp_id: 0,num_vertices(sg) 8, obj_value: 1
 , comp_id: 3058, sub_comp_id: 0,num_vertices(sg) 15, obj_value: 0.1
 , comp_id: 3129, sub_comp_id: 0,num_vertices(sg) 11, obj_value: 0.1
 , comp_id: 3133, sub_comp_id: 4,num_vertices(sg) 12, obj_value: 0.1
