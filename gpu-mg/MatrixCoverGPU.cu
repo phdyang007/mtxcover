@@ -379,7 +379,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
 #endif
         //__syncthreads();
         // cudaMemset(&results[*selected_row_id],search_depth,sizeof(int));
-        t_results[selected_row_id[k]] = search_depth[k];
+        shared_result[selected_row_id[k]] = search_depth[k];
         // set_vector_value<<<1,1>>>(results, *selected_row_id, search_depth);
         delete_rows_and_columns(t_dl_matrix, t_next_row, t_next_col,
                                 t_deleted_rows, t_deleted_cols, search_depth[k],
@@ -429,7 +429,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
                                         // previously
                                         // selected rows
             __syncthreads();
-            recover_results(t_results, search_depth[k],
+            recover_results(shared_result, search_depth[k],
                             t_rn); // recover results
             //__syncthreads();
             // cudaMemcpy(&current_conflict_count,
@@ -441,7 +441,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
               init_vectors(t_conflict_count, t_cn);
               init_vectors_reserved(t_deleted_cols, t_cn);
               init_vectors(t_deleted_rows, t_rn);
-              init_vectors(t_results, t_rn);
+              init_vectors(shared_result, t_rn);
               __syncthreads();
               remove_cols(t_deleted_cols, t_col_group, conflict_col_id[k],
                           t_cn);
@@ -463,7 +463,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
                                         // previously
                                         // selected rows
             __syncthreads();
-            recover_results(t_results, search_depth[k],
+            recover_results(shared_result, search_depth[k],
                             t_rn); // recover results
           }
         } else { // if all vertices are gone through, directly remove the edge
@@ -478,7 +478,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
           init_vectors(t_conflict_count, t_cn);
           init_vectors_reserved(t_deleted_cols, t_cn);
           init_vectors(t_deleted_rows, t_rn);
-          init_vectors(t_results, t_rn);
+          init_vectors(shared_result, t_rn);
           __syncthreads();
           remove_cols(t_deleted_cols, t_col_group, conflict_col_id[k], t_cn);
         }
