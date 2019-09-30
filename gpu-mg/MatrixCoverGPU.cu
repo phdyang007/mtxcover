@@ -275,6 +275,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
   __shared__ int shared_col_group[140];
 
   for (int k = blockIdx.x; k < graph_count; k += gridDim.x) {
+    int vertex_cn = vertex_num[k];
     int t_cn = total_dl_matrix_col_num[k];
     int t_rn = total_dl_matrix_row_num[k];
     int *t_conflict_count = conflict_count + offset_col[k];
@@ -332,17 +333,18 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
     __syncthreads();
     */
 
-    for (search_depth[k] = 1; search_depth[k] <= vertex_num[k];) {
+    for (search_depth[k] = 1; search_depth[k] <= vertex_cn;) {
+
 #ifndef BENCHMARK
       printf("search depth is %d\n", search_depth[k]);
       // std::cout<<"deleted_cols "<<std::endl;
       // cudaDeviceSynchronize();
       printf("deleted_cols\n");
-      print_vec(t_deleted_cols, t_cn);
+      print_vec(shared_deleted_cols, t_cn);
       // cudaDeviceSynchronize();
       // cudaDeviceSynchronize();
       printf("deleted_rows\n");
-      print_vec(t_deleted_rows, t_rn);
+      print_vec(shared_deleted_rows, t_rn);
       // cudaDeviceSynchronize();
       // cudaDeviceSynchronize();
       printf("results\n");
@@ -359,7 +361,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
       // existance_of_candidate_rows=0;
       // selected_row_id=-1;
       check_existance_of_candidate_rows(
-          t_deleted_rows, t_row_group, search_depth[k],
+          shared_deleted_rows, shared_row_group, search_depth[k],
           existance_of_candidate_rows + k, selected_row_id + k, t_rn);
       __syncthreads();
       // printf()
@@ -382,12 +384,12 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
         shared_result[selected_row_id[k]] = search_depth[k];
         // set_vector_value<<<1,1>>>(results, *selected_row_id, search_depth);
         delete_rows_and_columns(t_dl_matrix, t_next_row, t_next_col,
-                                t_deleted_rows, t_deleted_cols, search_depth[k],
-                                selected_row_id[k], t_rn,
+                                shared_deleted_rows, shared_deleted_cols,
+                                search_depth[k], selected_row_id[k], t_rn,
                                 t_cn); // delete covered rows and columns
         __syncthreads();
         // deleted_rows[*selected_row_id] = -search_depth;
-        t_deleted_rows[selected_row_id[k]] = -search_depth[k];
+        shared_deleted_rows[selected_row_id[k]] = -search_depth[k];
         // set_vector_value<<<1,1>>>(deleted_rows, *selected_row_id,
         // -search_depth);
 
@@ -400,29 +402,29 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
         search_depth[k]--;
         if (search_depth[k] > 0) {
 
-          get_conflict_node_id(t_deleted_rows, t_row_group, search_depth[k],
-                               conflict_node_id + k, t_rn);
+          get_conflict_node_id(shared_deleted_rows, shared_row_group,
+                               search_depth[k], conflict_node_id + k, t_rn);
           if (conflict_node_id[k] > 0) {
             __syncthreads();
-            get_conflict_edge(t_dl_matrix, t_deleted_rows, t_row_group,
+            get_conflict_edge(t_dl_matrix, shared_deleted_rows, shared_row_group,
                               conflict_node_id[k], search_depth[k],
                               t_conflict_edge, vertex_num[k], t_rn, t_cn);
             __syncthreads();
-            get_conflict_col_id(t_dl_matrix, t_deleted_cols,
+            get_conflict_col_id(t_dl_matrix, shared_deleted_cols,
                                 conflict_col_id + k, t_conflict_edge, t_cn,
                                 vertex_num[k]);
             __syncthreads();
 
             // conflict_count[*conflict_col_id]++;
             // update conflict edge count
-            t_conflict_count[conflict_col_id[k]]++;
+            shared_conflict_count[conflict_col_id[k]]++;
             // add_gpu<<<1,1>>>(&deleted_rows[*selected_row_id],1);
-            recover_deleted_rows(t_deleted_rows, search_depth[k],
+            recover_deleted_rows(shared_deleted_rows, search_depth[k],
                                  t_rn); // recover deleted
                                         // rows  previously
                                         // selected rows
             __syncthreads();
-            recover_deleted_cols(t_deleted_cols, search_depth[k],
+            recover_deleted_cols(shared_deleted_cols, search_depth[k],
                                  t_cn); // recover deleted
                                         // cols except
                                         // afftected by
@@ -432,31 +434,28 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
             recover_results(shared_result, search_depth[k],
                             t_rn); // recover results
             //__syncthreads();
-            // cudaMemcpy(&current_conflict_count,
-            // &conflict_count[*conflict_col_id], sizeof(int),
-            // cudaMemcpyDeviceToHost);
-            if (t_conflict_count[conflict_col_id[k]] >
+            if (shared_conflict_count[conflict_col_id[k]] >
                 hard_conflict_threshold) {
               search_depth[k] = 1;
-              init_vectors(t_conflict_count, t_cn);
-              init_vectors_reserved(t_deleted_cols, t_cn);
-              init_vectors(t_deleted_rows, t_rn);
+              init_vectors(shared_conflict_count, t_cn);
+              init_vectors_reserved(shared_deleted_cols, t_cn);
+              init_vectors(shared_deleted_rows, t_rn);
               init_vectors(shared_result, t_rn);
               __syncthreads();
-              remove_cols(t_deleted_cols, t_col_group, conflict_col_id[k],
-                          t_cn);
+              remove_cols(shared_deleted_cols, shared_col_group,
+                          conflict_col_id[k], t_cn);
               __syncthreads();
-              t_deleted_cols[conflict_col_id[k]] = size_bit;
+              shared_deleted_cols[conflict_col_id[k]] = size_bit;
 
               // /cudaMemset(&deleted_cols[*conflict_col_id],-1,sizeof(int));
             }
           } else {
-            recover_deleted_rows(t_deleted_rows, search_depth[k],
+            recover_deleted_rows(shared_deleted_rows, search_depth[k],
                                  t_rn); // recover deleted
                                         // rows  previously
                                         // selected rows
             __syncthreads();
-            recover_deleted_cols(t_deleted_cols, search_depth[k],
+            recover_deleted_cols(shared_deleted_cols, search_depth[k],
                                  t_cn); // recover deleted
                                         // cols except
                                         // afftected by
@@ -469,18 +468,19 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
         } else { // if all vertices are gone through, directly remove the edge
                  // with largest conflict count.
           search_depth[k] = 1;
-          get_largest_value(t_conflict_count, t_cn, max + k);
+          get_largest_value(shared_conflict_count, t_cn, max + k);
 
           // cudaMemcpy(conflict_col_id, conflict_col_id_gpu, sizeof(int),
           // cudaMemcpyDeviceToHost);
           __syncthreads();
-          find_index(t_conflict_count, t_cn, max + k, conflict_col_id + k);
-          init_vectors(t_conflict_count, t_cn);
-          init_vectors_reserved(t_deleted_cols, t_cn);
-          init_vectors(t_deleted_rows, t_rn);
+          find_index(shared_conflict_count, t_cn, max + k, conflict_col_id + k);
+          init_vectors(shared_conflict_count, t_cn);
+          init_vectors_reserved(shared_deleted_cols, t_cn);
+          init_vectors(shared_deleted_rows, t_rn);
           init_vectors(shared_result, t_rn);
           __syncthreads();
-          remove_cols(t_deleted_cols, t_col_group, conflict_col_id[k], t_cn);
+          remove_cols(shared_deleted_cols, shared_col_group, conflict_col_id[k],
+                      t_cn);
         }
         // print_vec(deleted_cols, total_dl_matrix_col_num);
         // print_vec(deleted_rows, total_dl_matrix_row_num);
@@ -488,6 +488,18 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
         // print_vec(results, total_dl_matrix_row_num);
       }
     }
+
+    for (int i = threadIdx.x; i < t_cn; i += blockDim.x) {
+      t_deleted_cols[i] = shared_deleted_cols[i];
+      t_conflict_count[i] = shared_conflict_count[i];
+      t_col_group[i] = shared_col_group[i];
+    }
+    for (int i = threadIdx.x; i < t_rn; i += blockDim.x) {
+      t_deleted_rows[i] = shared_deleted_rows[i];
+      t_results[i] = shared_result[i];
+      t_row_group[i] = shared_row_group[i];
+    }
+    __syncthreads();
   }
 }
 
