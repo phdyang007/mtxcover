@@ -81,8 +81,8 @@ int main(int argc, char *argv[]) {
       //  if (j != debug_graph) {
         //  continue;
         //}
-        std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
-        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, true, &ds);
+        //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
+        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
         //if(ds.conflict_count==2){assert(1==2);}
         conflict_count += ds.conflict_count;
         core_ns += timer.GetCoreUsedNs();

@@ -23,8 +23,11 @@ __device__ void find_index(int *vec, const int vec_length, int *value,
 __device__ void init_vectors_reserved(int *vec, const int vec_length);
 
 __device__ void check_existance_of_candidate_rows(
-    int *deleted_rows, int *row_group, const int search_depth, int *token,
+    short *deleted_rows, int *row_group, int search_depth, int *token,
     int *selected_row_id, const int total_dl_matrix_row_num);
+//__device__ void check_existance_of_candidate_rows(
+//    short *deleted_rows, int *row_group, int search_depth, int *token,
+//    int *selected_row_id, const int total_dl_matrix_row_num);
 
 __device__ void get_vertex_row_group(int *row_group, int *dl_matrix,
                                      const int vertex_num,
@@ -50,12 +53,20 @@ __device__ void get_conflict_node_id(int *deleted_rows, int *row_group,
                                      int *conflict_node_id,
                                      const int total_dl_matrix_row_num);
 
-__device__ void get_conflict_edge(int *dl_matrix, int *deleted_rows,
-                                  int *row_group, const int conflict_node_id,
-                                  const int search_depth, int *conflict_edge,
+
+
+__device__ void get_conflict_edge(int *dl_matrix, short *deleted_rows,
+                                  const int *row_group, int conflict_node_id,
+                                  int search_depth, int *conflict_edge,
                                   const int vertex_num,
                                   const int total_dl_matrix_row_num,
                                   const int total_dl_matrix_col_num);
+//__device__ void get_conflict_edge(int *dl_matrix, int *deleted_rows,
+//                                  int *row_group, const int conflict_node_id,
+//                                  const int search_depth, int *conflict_edge,
+//                                  const int vertex_num,
+//                                  const int total_dl_matrix_row_num,
+//                                  const int total_dl_matrix_col_num);
 
 __device__ void get_conflict_col_id(int *dl_matrix, int *deleted_cols,
                                     int *conflict_col_id, int *conflict_edge,
