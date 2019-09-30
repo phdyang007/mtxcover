@@ -17,10 +17,10 @@ std::vector<std::string> validation_sets = {
 */
 ///*
 std::vector<std::string> test_datasets = {
-    "../matrix/s2", "../matrix/s3",  "../matrix/s4", "../matrix/s5",
-    "../matrix/c1", "../matrix/c2",  "../matrix/c3", "../matrix/c4",
-    "../matrix/c5", "../matrix/c6",  "../matrix/c7", "../matrix/c8",
-    "../matrix/c9", "../matrix/c10",
+    "../matrix/s1", "../matrix/s2", "../matrix/s3",  "../matrix/s4",
+    "../matrix/s5", "../matrix/c1", "../matrix/c2",  "../matrix/c3",
+    "../matrix/c4", "../matrix/c5", "../matrix/c6",  "../matrix/c7",
+    "../matrix/c8", "../matrix/c9", "../matrix/c10",
 };
 
 std::vector<std::string> validation_sets = {

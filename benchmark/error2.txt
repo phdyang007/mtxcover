@@ -1,12 +1,24 @@
 
 ========================
 
+>>> DataSet: ../matrix/s1    Matrix Count: 26
+-----------------------
+GPU MG BENCHMARK
+
+> Core Used NS: 640000.000000   s:0.000640
+> Load to GPU Used NS: 1119196416.000000
+========================
+
+
+
+========================
+
 >>> DataSet: ../matrix/s2    Matrix Count: 2353
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 55898880.000000   s:0.055899
-> Load to GPU Used NS: 1232509952.000000
+> Core Used NS: 40136448.000000   s:0.040136
+> Load to GPU Used NS: 6511616.000000
 ========================
 
 
@@ -17,8 +29,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 218663936.000000   s:0.218664
-> Load to GPU Used NS: 18992640.000000
+> Core Used NS: 163718912.000000   s:0.163719
+> Load to GPU Used NS: 19111680.000000
 ========================
 
 
@@ -29,8 +41,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 163625984.000000   s:0.163626
-> Load to GPU Used NS: 17712896.000000
+> Core Used NS: 126854656.000000   s:0.126855
+> Load to GPU Used NS: 17896192.000000
 ========================
 
 
@@ -41,8 +53,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 72802816.000000   s:0.072803
-> Load to GPU Used NS: 15617536.000000
+> Core Used NS: 56675584.000000   s:0.056676
+> Load to GPU Used NS: 15663360.000000
 ========================
 
 
@@ -53,8 +65,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 496640.000000   s:0.000497
-> Load to GPU Used NS: 377600.000000
+> Core Used NS: 365824.000000   s:0.000366
+> Load to GPU Used NS: 376064.000000
 ========================
 
 
@@ -65,8 +77,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 78848.000000   s:0.000079
-> Load to GPU Used NS: 277248.000000
+> Core Used NS: 61952.000000   s:0.000062
+> Load to GPU Used NS: 287744.000000
 ========================
 
 
@@ -77,8 +89,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 1542656.000000   s:0.001543
-> Load to GPU Used NS: 294400.000000
+> Core Used NS: 1100544.000000   s:0.001101
+> Load to GPU Used NS: 301568.000000
 ========================
 
 
@@ -89,8 +101,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 404992.000000   s:0.000405
-> Load to GPU Used NS: 298496.000000
+> Core Used NS: 307712.000000   s:0.000308
+> Load to GPU Used NS: 308480.000000
 ========================
 
 
@@ -101,8 +113,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 2307328.000000   s:0.002307
-> Load to GPU Used NS: 299520.000000
+> Core Used NS: 1700608.000000   s:0.001701
+> Load to GPU Used NS: 305920.000000
 ========================
 
 
@@ -113,8 +125,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 1669888.000000   s:0.001670
-> Load to GPU Used NS: 358656.000000
+> Core Used NS: 1236736.000000   s:0.001237
+> Load to GPU Used NS: 370688.000000
 ========================
 
 
@@ -125,8 +137,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 118278912.000000   s:0.118279
-> Load to GPU Used NS: 455168.000000
+> Core Used NS: 85358336.000000   s:0.085358
+> Load to GPU Used NS: 450560.000000
 ========================
 
 
@@ -137,8 +149,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 891648.000000   s:0.000892
-> Load to GPU Used NS: 462080.000000
+> Core Used NS: 622848.000000   s:0.000623
+> Load to GPU Used NS: 456960.000000
 ========================
 
 
@@ -149,8 +161,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 90315008.000000   s:0.090315
-> Load to GPU Used NS: 2636032.000000
+> Core Used NS: 68916992.000000   s:0.068917
+> Load to GPU Used NS: 2668288.000000
 ========================
 
 
@@ -161,8 +173,8 @@ GPU MG BENCHMARK
 -----------------------
 GPU MG BENCHMARK
 
-> Core Used NS: 41776384.000000   s:0.041776
-> Load to GPU Used NS: 683520.000000
+> Core Used NS: 30681856.000000   s:0.030682
+> Load to GPU Used NS: 690432.000000
 ========================
 
 
