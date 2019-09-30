@@ -1,3 +1,0 @@
-==14253== NVPROF is profiling process 14253, command: /home/CORP.PKUSC.ORG/yibolin/projects/mtxcover/benchmark/build/gpumg.bin
-==14253== Some kernel(s) will be replayed on device 0 in order to collect all events/metrics.
-==14253== Generated result file: /home/CORP.PKUSC.ORG/yibolin/projects/mtxcover/benchmark/.metadata/.plugins/com.nvidia.viper/launch/3/api_14253.log0
