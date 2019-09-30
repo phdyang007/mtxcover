@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
   }
   int n = test_datasets.size();
   int debug_file = 2  ;
-  int debug_graph = 17;
+  int debug_graph = 1950;
   for (int i = 0; i < n; ++i) {
     if (i != debug_file - 1) {
       continue;
@@ -78,11 +78,12 @@ int main(int argc, char *argv[]) {
       int conflict_count = 0;
       for (auto &ds : dataset) {
         j++;
-        //if (j != debug_graph) {
+      //  if (j != debug_graph) {
         //  continue;
         //}
-        //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
-        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
+        std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
+        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, true, &ds);
+        //if(ds.conflict_count==2){assert(1==2);}
         conflict_count += ds.conflict_count;
         core_ns += timer.GetCoreUsedNs();
         if (validate) {
