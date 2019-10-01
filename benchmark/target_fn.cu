@@ -309,9 +309,10 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   timer.EndDataLoadTime();
 
   int hard_conflict_threshold = 500;
-  int thread_size = 32;
+  int graph_per_block=2;
+  dim3 thread_size(32,graph_per_block);
   cudaDeviceSynchronize();
-  gpu_mg::init_vertex_group<<<n,thread_size>>>(
+  gpu_mg::init_vertex_group<<<n,32>>>(
     row_group_gpu, dl_matrix_gpu, vertex_num_gpu, 
     total_dl_matrix_col_num_gpu, total_dl_matrix_row_num_gpu, 
     offset_row_gpu, offset_matrix_gpu,n);
@@ -320,14 +321,14 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   timer.StartCoreTime();
 
   cudaProfilerStart();
-  gpu_mg::mc_solver<<<n, thread_size>>>(
+  gpu_mg::mc_solver<<<n/graph_per_block+1, thread_size>>>(
       dl_matrix_gpu, next_col_gpu, next_row_gpu, results_gpu, deleted_cols_gpu,
       deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
       vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
       offset_col_gpu, offset_row_gpu, offset_matrix_gpu, search_depth_gpu,
       selected_row_id_gpu, current_conflict_count_gpu, conflict_node_id_gpu,
       conflict_col_id_gpu, existance_of_candidate_rows_gpu, conflict_edge_gpu,
-      max_gpu, n, hard_conflict_threshold);
+      max_gpu, n, hard_conflict_threshold, graph_per_block);
   cudaDeviceSynchronize();
   cudaProfilerStop();
 

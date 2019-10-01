@@ -77,7 +77,7 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
           int *current_conflict_count, int *conflict_node_id,
           int *conflict_col_id, int *existance_of_candidate_rows,
           int *conflict_edge, int *max, const int graph_count,
-          const int hard_conflict_threshold);
+          const int hard_conflict_threshold, const int graph_per_block);
 // void mc_solver(int* dl_matrix, int* results, int* deleted_cols, int*
 // deleted_rows, int* col_group,int* row_group, int* conflict_count,	const
 // int vertex_num, const int total_dl_matrix_row_num, const int
