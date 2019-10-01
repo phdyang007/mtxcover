@@ -264,6 +264,22 @@ init_vertex_group(int *row_group, int *dl_matrix, int* vertex_num, int* t_cn, in
 
 }
 
+///
+/// @param dl_matrix binary matrix, can be unsigned char, even boolean 
+/// @param next_col can be unsigned char 
+/// @param next_row can be unsigned short 
+/// @param results can be unsigned short 
+/// @param col_group can be char 
+/// @param row_group can be unsigned char 
+/// @param conflict_count must be unsigned int 
+/// @param vertex_num a number indicating how many vertices 
+/// @param total_dl_matrix_row_num a number, M
+/// @param total_dl_matrix_col_num a number, N
+/// @param offset_col CSR 
+/// @param offset_row CSR 
+/// @param offset_matrix CSR
+/// @param graph_count total number of graphs 
+
 __global__ void
 mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
           int *_deleted_cols, int *_deleted_rows, int *col_group, int *row_group,
