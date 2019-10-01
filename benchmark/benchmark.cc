@@ -50,12 +50,12 @@ std::vector<std::string> gpu_results = {
 
 int main(int argc, char *argv[]) {
   bool validate = false;
-  bool dumpout = false;
+  bool dumpout = true;
   if (argc >= 2) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 10;
+  int debug_file = 2;
   int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
     if (i != debug_file - 1) {

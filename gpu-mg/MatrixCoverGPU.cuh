@@ -65,6 +65,8 @@ __device__ void get_conflict_col_id(int *dl_matrix, int *deleted_cols,
 __device__ void remove_cols(int *deleted_cols, int *col_group,
                             const int conflict_col_id,
                             const int total_dl_matrix_col_num);
+__global__ void 
+init_vertex_group(int *row_group, int *dl_matrix, int* vertex_num, int* t_cn, int* t_rn, int *offset_row, int *offset_matrix, int graph_count);
 
 __global__ void
 mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
