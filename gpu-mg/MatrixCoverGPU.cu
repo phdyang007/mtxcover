@@ -279,10 +279,10 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
 
   //add shared mem
 
-  __shared__ short t_deleted_rows[256];
-  __shared__ short t_deleted_cols[128];
-  __shared__ short t_conflict_count[256];
-  __shared__ short t_results[256];
+  __shared__ short t_deleted_rows[340];
+  __shared__ short t_deleted_cols[170];
+  __shared__ short t_conflict_count[170];
+  __shared__ short t_results[340];
   __shared__ int t_conflict_edge[2];
   __shared__ short search_depth;
   __shared__ int t_max;
