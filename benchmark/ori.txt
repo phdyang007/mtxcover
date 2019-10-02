@@ -1,0 +1,120 @@
+
+========================
+
+>>> DataSet: ../matrix/s1    Matrix Count: 26
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 180992.000000   s:0.000181
+
+========================
+
+>>> DataSet: ../matrix/s2    Matrix Count: 2353
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 24558848.000000   s:0.024559
+
+========================
+
+>>> DataSet: ../matrix/s3    Matrix Count: 7330
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 124420864.000000   s:0.124421
+
+========================
+
+>>> DataSet: ../matrix/s4    Matrix Count: 7035
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 106399744.000000   s:0.106400
+
+========================
+
+>>> DataSet: ../matrix/s5    Matrix Count: 6088
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 53013248.000000   s:0.053013
+
+========================
+
+>>> DataSet: ../matrix/c1    Matrix Count: 5
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 84992.000000   s:0.000085
+
+========================
+
+>>> DataSet: ../matrix/c2    Matrix Count: 5
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 28672.000000   s:0.000029
+
+========================
+
+>>> DataSet: ../matrix/c3    Matrix Count: 12
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 340736.000000   s:0.000341
+
+========================
+
+>>> DataSet: ../matrix/c4    Matrix Count: 10
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 79616.000000   s:0.000080
+
+========================
+
+>>> DataSet: ../matrix/c5    Matrix Count: 4
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 266240.000000   s:0.000266
+
+========================
+
+>>> DataSet: ../matrix/c6    Matrix Count: 13
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 336896.000000   s:0.000337
+
+========================
+
+>>> DataSet: ../matrix/c7    Matrix Count: 20
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 15981568.000000   s:0.015982
+
+========================
+
+>>> DataSet: ../matrix/c8    Matrix Count: 19
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 242432.000000   s:0.000242
+
+========================
+
+>>> DataSet: ../matrix/c9    Matrix Count: 385
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 68796928.000000   s:0.068797
+
+========================
+
+>>> DataSet: ../matrix/c10    Matrix Count: 70
+-----------------------
+CPU BENCHMARK
+
+> Core Used NS: 7029504.000000   s:0.007030

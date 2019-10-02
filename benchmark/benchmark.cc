@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
       int j = 0;
       int n = dataset.size();
 
-      #pragma omp parallel for num_threads(12) reduction(+:core_ns)
+      #pragma omp parallel for schedule(dynamic) reduction(+:core_ns)
       for (int i = 0; i < n; ++i) {
         auto &ds = dataset[i];
         // j++;
