@@ -10,13 +10,14 @@ __device__ void delete_rows_and_columns(
     const int selected_row_id, const int total_dl_matrix_row_num,
     const int total_dl_matrix_col_num) {
   int selected_row_idx = selected_row_id * total_dl_matrix_col_num;
-
+  //int tmp_deleted_cols_count = 0; 
   for (int i = threadIdx.x; i < total_dl_matrix_col_num;
        // // The below line will have negative effect of the col number is small
        //  i += (next_col[selected_row_idx + i] + blockDim.x - 1) / blockDim.x
        i += blockDim.x) {
     if (deleted_cols[i] == 0 && dl_matrix[selected_row_idx + i] == 1) {
       deleted_cols[i] = search_depth;
+      //atomicInc(&tmp_deleted_cols_count)
       for (int j = 0; j < total_dl_matrix_row_num;
            j += next_row[i * total_dl_matrix_row_num + j]) {
         if (deleted_rows[j] == 0 &&
@@ -80,7 +81,7 @@ __device__ void init_vectors_reserved(short *vec, const int vec_length) {
 __device__ void check_existance_of_candidate_rows(
     short *deleted_rows, int *row_group, const int search_depth, int *token,
     int *selected_row_id, const int total_dl_matrix_row_num) {
-  for (int i = threadIdx.x; i<total_dl_matrix_row_num && * selected_row_id> i;
+  for (int i = threadIdx.x; i<total_dl_matrix_row_num;
        i = i + blockDim.x) {
     // std::cout<<deleted_rows[i]<<' '<<row_group[i]<<std::endl;
     if (deleted_rows[i] == 0 && row_group[i] == search_depth) {
@@ -89,7 +90,7 @@ __device__ void check_existance_of_candidate_rows(
       *token = 1;
       atomicMin(selected_row_id, i);
       // If find a number can break;
-      break;
+      //break;
     }
   }
  
@@ -198,11 +199,11 @@ __device__ void get_conflict_col_id(int *dl_matrix, short *deleted_cols,
   //  printf("conflict edge a %d edge b
   //  %d\n",conflict_edge[0],conflict_edge[1]);
   // }
+  int *edge_a_dlmatrix = dl_matrix+conflict_edge[0] * total_dl_matrix_col_num;
+  int *edge_b_dlmatrix = dl_matrix+conflict_edge[1] * total_dl_matrix_col_num; 
   for (int j = threadIdx.x; j < total_dl_matrix_col_num; j = j + blockDim.x) {
-    if (dl_matrix[conflict_edge[0] * total_dl_matrix_col_num + j] ==
-            dl_matrix[conflict_edge[1] * total_dl_matrix_col_num + j] &&
-        deleted_cols[j] > 0 &&
-        dl_matrix[conflict_edge[1] * total_dl_matrix_col_num + j] == 1) {
+    if (edge_a_dlmatrix[j] == edge_b_dlmatrix[j] &&
+        deleted_cols[j] > 0 && edge_b_dlmatrix[j] == 1) {
       atomicMax(conflict_col_id, j);
     }
   }

@@ -9,7 +9,7 @@ namespace gpu_mg {
 
 __device__ void delete_rows_and_columns(
     const int *dl_matrix, const int *next_row, const int *next_col,
-    int *deleted_rows, int *deleted_cols, const int search_depth,
+    int *deleted_rows, int *deleted_cols, short *deleted_col_id, const int search_depth,
     const int selected_row_id, const int total_dl_matrix_row_num,
     const int total_dl_matrix_col_num);
 
