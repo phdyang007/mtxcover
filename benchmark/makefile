@@ -21,7 +21,7 @@ target_fn.a: common.h target_fn.cu target_fn.h ../gpu/MatrixCoverGPU.cu ../gpu-m
 cpu.bin: basic.o target_fn.a
 	mkdir -p build
 	nvcc -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
-		 -lcudadevrt benchmark.cc -DCPU -o  build/$@
+		 -lcudadevrt -Xcompiler -fopenmp benchmark.cc -DCPU -o  build/$@
 
 gpu.bin: basic.o target_fn.a
 	mkdir -p build

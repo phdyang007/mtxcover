@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 2;
+  int debug_file = 3;
   int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
     if (i != debug_file - 1) {
@@ -73,11 +73,13 @@ int main(int argc, char *argv[]) {
 #ifdef CPU
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
-      double core_ns = 0;
       int j = 0;
       
-        #pragma omp parallel for
-        for (auto &ds : dataset) {
+      double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
+              clock_type::now().time_since_epoch()).count();
+        #pragma omp parallel for num_threads(6) schedule(dynamic, 128)
+        for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
+            auto& ds = dataset[idx];
           // j++;
           // if (j != debug_graph) {
           //   continue;
@@ -85,7 +87,7 @@ int main(int argc, char *argv[]) {
           // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
           // "<<j<<std::endl;
           auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
-          core_ns += timer.GetCoreUsedNs();
+          //core_ns += timer.GetCoreUsedNs();
           if (validate) {
             ValidateArray(ds.expected_result, ds.final_result);
           }
@@ -101,6 +103,9 @@ int main(int argc, char *argv[]) {
           }
         }
       
+        double time_end = std::chrono::duration_cast<std::chrono::nanoseconds>(
+              clock_type::now().time_since_epoch()).count(); 
+        double core_ns = time_end - time_bgn;
       std::cout << "> Core Used NS: " << std::to_string(core_ns)
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
