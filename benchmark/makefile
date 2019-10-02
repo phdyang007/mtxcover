@@ -13,7 +13,7 @@ target_fn.a: common.h target_fn.cu target_fn.h ../gpu/MatrixCoverGPU.cu ../gpu-m
 	nvcc -c -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false \
 		target_fn.cu -o build/target_fn.o
 	gcc -c -O2 -std=c++11 -I../cpu ../cpu/MatrixCover.cpp \
-		-DBENCHMARK -o build/cpu_matrix_cover.o
+		-DBENCHMARK -fopenmp -o build/cpu_matrix_cover.o
 	ar cr build/target_fn.a build/gpu_mg_cover.o \
 		build/gpu_cover.o build/target_fn.o \
 		build/cpu_matrix_cover.o

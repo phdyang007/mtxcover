@@ -50,7 +50,7 @@ std::vector<std::string> gpu_results = {
 
 int main(int argc, char *argv[]) {
   bool validate = false;
-  bool dumpout = true;
+  bool dumpout = false;
   if (argc >= 2) {
     validate = strcmp(argv[1], "1") == 0;
   }
@@ -75,29 +75,32 @@ int main(int argc, char *argv[]) {
     {
       double core_ns = 0;
       int j = 0;
-      for (auto &ds : dataset) {
-        // j++;
-        // if (j != debug_graph) {
-        //   continue;
-        // }
-        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
-        // "<<j<<std::endl;
-        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
-        core_ns += timer.GetCoreUsedNs();
-        if (validate) {
-          ValidateArray(ds.expected_result, ds.final_result);
-        }
-        if (dumpout) {
-          std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
-          if (of.is_open()) {
-            for (int i = 0; i < ds.final_result.size(); i++) {
-              of << ds.final_result[i] << ' ';
-            }
+      
+        #pragma omp parallel for
+        for (auto &ds : dataset) {
+          // j++;
+          // if (j != debug_graph) {
+          //   continue;
+          // }
+          // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
+          // "<<j<<std::endl;
+          auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
+          core_ns += timer.GetCoreUsedNs();
+          if (validate) {
+            ValidateArray(ds.expected_result, ds.final_result);
           }
-          of << std::endl;
-          of.close();
+          if (dumpout) {
+            std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
+            if (of.is_open()) {
+              for (int i = 0; i < ds.final_result.size(); i++) {
+                of << ds.final_result[i] << ' ';
+              }
+            }
+            of << std::endl;
+            of.close();
+          }
         }
-      }
+      
       std::cout << "> Core Used NS: " << std::to_string(core_ns)
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
