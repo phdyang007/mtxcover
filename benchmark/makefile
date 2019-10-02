@@ -20,18 +20,21 @@ target_fn.a: common.h target_fn.cu target_fn.h ../gpu/MatrixCoverGPU.cu ../gpu-m
 
 cpu.bin: basic.o target_fn.a
 	mkdir -p build
-	nvcc -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
-		 -lcudadevrt benchmark.cc -DCPU -o  build/$@
+	g++ -O2 -std=c++11 \
+		 benchmark.cc build/target_fn.a build/basic.o	\
+		 -lcudart -fopenmp -DCPU -o  build/$@
 
 gpu.bin: basic.o target_fn.a
 	mkdir -p build
-	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
-		 -lcudadevrt benchmark.cc -DGPU -o build/$@
+	g++ -O2 -std=c++11 \
+		  benchmark.cc build/target_fn.a build/basic.o	\
+		  -lcudart -DGPU -o build/$@
 
 gpumg.bin: basic.o target_fn.a
 	mkdir -p build
-	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
-		 -lcudadevrt benchmark.cc -DGPUMG -o build/$@
+	g++ -O2 -std=c++11 \
+		  benchmark.cc build/target_fn.a build/basic.o	\
+		  -lcudart -DGPUMG -o build/$@
 
 
 clean:

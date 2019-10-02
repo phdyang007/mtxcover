@@ -58,9 +58,9 @@ int main(int argc, char *argv[]) {
   int debug_file = 10;
   int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
-    if (i != debug_file - 1) {
-      continue;
-    }
+    // if (i != debug_file - 1) {
+    //   continue;
+    // }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
@@ -75,7 +75,11 @@ int main(int argc, char *argv[]) {
     {
       double core_ns = 0;
       int j = 0;
-      for (auto &ds : dataset) {
+      int n = dataset.size();
+
+      #pragma omp parallel for num_threads(12) reduction(+:core_ns)
+      for (int i = 0; i < n; ++i) {
+        auto &ds = dataset[i];
         // j++;
         // if (j != debug_graph) {
         //   continue;
@@ -87,6 +91,7 @@ int main(int argc, char *argv[]) {
         if (validate) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
+        // std::cout << "This thread is: " << std::this_thread::get_id() << std::endl;
         if (dumpout) {
           std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
           if (of.is_open()) {
