@@ -5,17 +5,17 @@ namespace gpu_mg {
 //constexpr int size_bit = 1 << 31;
 
 __device__ void delete_rows_and_columns(
-    const int *dl_matrix, const int *next_row, const int *next_col,
+    int *dl_matrix, const int *next_row, const int *next_col,
     short *deleted_rows, short *deleted_cols, const int search_depth,
     const int selected_row_id, const int total_dl_matrix_row_num,
     const int total_dl_matrix_col_num) {
-  int selected_row_idx = selected_row_id * total_dl_matrix_col_num;
+  int * selected_row = dl_matrix+selected_row_id * total_dl_matrix_col_num;
   //int tmp_deleted_cols_count = 0; 
   for (int i = threadIdx.x; i < total_dl_matrix_col_num;
        // // The below line will have negative effect of the col number is small
        //  i += (next_col[selected_row_idx + i] + blockDim.x - 1) / blockDim.x
        i += blockDim.x) {
-    if (deleted_cols[i] == 0 && dl_matrix[selected_row_idx + i] == 1) {
+    if (deleted_cols[i] == 0 && selected_row[i] == 1) {
       deleted_cols[i] = search_depth;
       //atomicInc(&tmp_deleted_cols_count)
       for (int j = 0; j < total_dl_matrix_row_num;
@@ -23,11 +23,38 @@ __device__ void delete_rows_and_columns(
         if (deleted_rows[j] == 0 &&
             dl_matrix[j * total_dl_matrix_col_num + i] == 1) {
           deleted_rows[j] = search_depth;
+          //__syncthreads();
+          //break;
         }
       }
     }
+    
+    
   }
-  
+  //__syncthreads();
+  //int col_id;
+  //int row_id;
+  //int val;
+  //int selected_row_val;
+  //int *selected_row = dl_matrix+selected_row_id * total_dl_matrix_col_num;
+//
+  //for (int i = threadIdx.x; i < total_dl_matrix_row_num * total_dl_matrix_col_num; i += blockDim.x){
+  //  row_id = i/total_dl_matrix_col_num;
+  //  col_id = i%total_dl_matrix_col_num;
+//
+  //  val = dl_matrix[i];
+  //  if(val ==0){
+  //    continue;
+  //  }
+  //  selected_row_val = selected_row[col_id];
+  //  //delete cols
+  //  if (val==1 && selected_row_val == 1 && deleted_cols[col_id]!=-1) {
+//
+  //    deleted_rows[row_id] = deleted_rows[row_id]==0?search_depth:deleted_rows[row_id];
+  //    deleted_cols[col_id] = deleted_cols[col_id]==0?search_depth:deleted_cols[col_id];
+  //  }
+  //}
+
 }
 
 __device__ void init_vectors(short *vec, const int vec_length) {
@@ -281,6 +308,7 @@ init_vertex_group(int *row_group, int *dl_matrix, int* vertex_num, int* t_cn, in
 /// @param offset_matrix CSR
 /// @param graph_count total number of graphs 
 /// @param graph_per_block graphs that can be solved on one threadblock
+#define GRAPH_PER_BLOCK 2
 
 __global__ void
 mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
@@ -297,27 +325,27 @@ mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,
 
   //add shared mem
 
-  __shared__ short t_deleted_rows[4][512];
-  __shared__ short t_deleted_cols[4][256];
-  __shared__ short t_conflict_count[4][256];
-  __shared__ short t_results[4][512];
-  __shared__ int t_conflict_edge[4][2];
-  __shared__ short search_depth[4];
-  __shared__ int t_max[4];
-  __shared__ int t_existance_of_candidate_rows[4];
-  __shared__ int t_conflict_node_id[4];
-  __shared__ int t_conflict_col_id[4];
-  __shared__ int t_vertex_num[4];
-  __shared__ int t_selected_row_id[4];
+  __shared__ short t_deleted_rows[GRAPH_PER_BLOCK][512];
+  __shared__ short t_deleted_cols[GRAPH_PER_BLOCK][256];
+  __shared__ short t_conflict_count[GRAPH_PER_BLOCK][256];
+  __shared__ short t_results[GRAPH_PER_BLOCK][512];
+  __shared__ int t_conflict_edge[GRAPH_PER_BLOCK][2];
+  __shared__ short search_depth[GRAPH_PER_BLOCK];
+  __shared__ int t_max[GRAPH_PER_BLOCK];
+  __shared__ int t_existance_of_candidate_rows[GRAPH_PER_BLOCK];
+  __shared__ int t_conflict_node_id[GRAPH_PER_BLOCK];
+  __shared__ int t_conflict_col_id[GRAPH_PER_BLOCK];
+  __shared__ int t_vertex_num[GRAPH_PER_BLOCK];
+  __shared__ int t_selected_row_id[GRAPH_PER_BLOCK];
   //
-  __shared__ int t_cn[4];
-  __shared__ int t_rn[4];
-  __shared__ int *t_final_results[4];
-  __shared__ int *t_row_group[4];
-  __shared__ int *t_col_group[4];
-  __shared__ int *t_dl_matrix[4];
-  __shared__ int *t_next_col[4];
-  __shared__ int *t_next_row[4];
+  __shared__ int t_cn[GRAPH_PER_BLOCK];
+  __shared__ int t_rn[GRAPH_PER_BLOCK];
+  __shared__ int *t_final_results[GRAPH_PER_BLOCK];
+  __shared__ int *t_row_group[GRAPH_PER_BLOCK];
+  __shared__ int *t_col_group[GRAPH_PER_BLOCK];
+  __shared__ int *t_dl_matrix[GRAPH_PER_BLOCK];
+  __shared__ int *t_next_col[GRAPH_PER_BLOCK];
+  __shared__ int *t_next_row[GRAPH_PER_BLOCK];
 
   //__shared__
   //end add shared mem

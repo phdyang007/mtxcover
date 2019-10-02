@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 3;
-  int debug_graph = 1691;
+  int debug_file = 2;
+  int debug_graph = 17;
   for (int i = 0; i < n; ++i) {
     if (i != debug_file - 1) {
       continue;
@@ -77,15 +77,14 @@ int main(int argc, char *argv[]) {
       
       double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
               clock_type::now().time_since_epoch()).count();
-        #pragma omp parallel for num_threads(6) schedule(dynamic, 128)
+        #pragma omp parallel for num_threads(4) schedule(dynamic, 128)
         for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
             auto& ds = dataset[idx];
-          // j++;
-          // if (j != debug_graph) {
-          //   continue;
-          // }
-          // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
-          // "<<j<<std::endl;
+          j++;
+          //if (j != debug_graph) {
+          //  continue;
+          //}
+          //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
           auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
           //core_ns += timer.GetCoreUsedNs();
           if (validate) {
