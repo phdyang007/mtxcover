@@ -2,3 +2,5 @@
 *.o
 *.bin
 build/
+*.a
+test/

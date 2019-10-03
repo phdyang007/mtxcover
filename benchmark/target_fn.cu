@@ -234,7 +234,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   int *results_gpu;
   int *conflict_edge_gpu;
   cudaMalloc(&dl_matrix_gpu, sizeof(int) * total_matrix);
-  cudaMalloc(&conflict_edge_gpu, sizeof(int) * 2 * n);
+  //cudaMalloc(&conflict_edge_gpu, sizeof(int) * 2 * n);
   cudaMalloc(&next_col_gpu, sizeof(int) * total_matrix);
   cudaMalloc(&next_row_gpu, sizeof(int) * total_matrix);
   cudaMemcpy(dl_matrix_gpu, datasets->dl_matrix.data(),
@@ -251,11 +251,11 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   int *row_group_gpu;
   int *conflict_count_gpu;
 
-  cudaMalloc(&deleted_cols_gpu, sizeof(int) * total_col);
-  cudaMalloc(&deleted_rows_gpu, sizeof(int) * total_row);
+  //cudaMalloc(&deleted_cols_gpu, sizeof(int) * total_col);
+  //cudaMalloc(&deleted_rows_gpu, sizeof(int) * total_row);
   cudaMalloc(&col_group_gpu, sizeof(int) * total_col);
   cudaMalloc(&row_group_gpu, sizeof(int) * total_row);
-  cudaMalloc(&conflict_count_gpu, sizeof(int) * total_col);
+  //cudaMalloc(&conflict_count_gpu, sizeof(int) * total_col);
   cudaMemcpy(col_group_gpu, datasets->col_group.data(), sizeof(int) * total_col,
              cudaMemcpyHostToDevice);
 
@@ -283,7 +283,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   cudaMalloc(&offset_col_gpu, sizeof(int) * n);
   cudaMalloc(&offset_row_gpu, sizeof(int) * n);
   cudaMalloc(&offset_matrix_gpu, sizeof(int) * n);
-  cudaMalloc(&max_gpu, sizeof(int) * n);
+  //cudaMalloc(&max_gpu, sizeof(int) * n);
 
   cudaMemcpy(offset_col_gpu, datasets->offset_col.data(), sizeof(int) * n,
              cudaMemcpyHostToDevice);
@@ -299,12 +299,12 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   int *conflict_col_id_gpu;
   int *existance_of_candidate_rows_gpu;
 
-  cudaMalloc(&search_depth_gpu, sizeof(int) * n);
-  cudaMalloc(&selected_row_id_gpu, sizeof(int) * n);
-  cudaMalloc(&current_conflict_count_gpu, sizeof(int) * n);
-  cudaMalloc(&conflict_node_id_gpu, sizeof(int) * n);
-  cudaMalloc(&conflict_col_id_gpu, sizeof(int) * n);
-  cudaMalloc(&existance_of_candidate_rows_gpu, sizeof(int) * n);
+  //cudaMalloc(&search_depth_gpu, sizeof(int) * n);
+  //cudaMalloc(&selected_row_id_gpu, sizeof(int) * n);
+  //cudaMalloc(&current_conflict_count_gpu, sizeof(int) * n);
+  //cudaMalloc(&conflict_node_id_gpu, sizeof(int) * n);
+  //cudaMalloc(&conflict_col_id_gpu, sizeof(int) * n);
+  //cudaMalloc(&existance_of_candidate_rows_gpu, sizeof(int) * n);
 
   timer.EndDataLoadTime();
 
@@ -350,7 +350,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
       }
     }
   }
-
+  /*
   if (print_result) {
     cudaMemcpy(deleted_cols.data(), deleted_cols_gpu, sizeof(int) * total_col,
                cudaMemcpyDeviceToHost);
@@ -375,30 +375,31 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
       std::cout << "Conflict Num is " << conflict_count[k] / 3 << std::endl;
     }
   }
+  */
 
   cudaFree(dl_matrix_gpu);
   cudaFree(next_col_gpu);
   cudaFree(next_row_gpu);
   cudaFree(results_gpu);
-  cudaFree(deleted_cols_gpu);
-  cudaFree(deleted_rows_gpu);
+  //cudaFree(deleted_cols_gpu);
+  //cudaFree(deleted_rows_gpu);
   cudaFree(col_group_gpu);
   cudaFree(row_group_gpu);
-  cudaFree(conflict_count_gpu);
-  cudaFree(max_gpu);
+  //cudaFree(conflict_count_gpu);
+  //cudaFree(max_gpu);
   cudaFree(vertex_num_gpu);
   cudaFree(total_dl_matrix_col_num_gpu);
   cudaFree(total_dl_matrix_row_num_gpu);
   cudaFree(offset_col_gpu);
   cudaFree(offset_row_gpu);
   cudaFree(offset_matrix_gpu);
-  cudaFree(search_depth_gpu);
-  cudaFree(selected_row_id_gpu);
-  cudaFree(current_conflict_count_gpu);
-  cudaFree(conflict_col_id_gpu);
-  cudaFree(conflict_node_id_gpu);
-  cudaFree(existance_of_candidate_rows_gpu);
-  cudaFree(conflict_edge_gpu);
+  //cudaFree(search_depth_gpu);
+  //cudaFree(selected_row_id_gpu);
+  //cudaFree(current_conflict_count_gpu);
+  //cudaFree(conflict_col_id_gpu);
+  //cudaFree(conflict_node_id_gpu);
+  //cudaFree(existance_of_candidate_rows_gpu);
+  //cudaFree(conflict_edge_gpu);
   return timer;
 }
 
