@@ -5,12 +5,12 @@ namespace gpu_mg {
 //constexpr int size_bit = 1 << 31;
 
 __device__ void delete_rows_and_columns(
-    int *dl_matrix, const int *next_row, const int *next_col,
+    int *dl_matrix, const int *next_row, int *next_col,
     short *deleted_rows, short *deleted_cols, const int search_depth,
     const int selected_row_id, const int total_dl_matrix_row_num,
     const int total_dl_matrix_col_num) {
   int * selected_row = dl_matrix+selected_row_id * total_dl_matrix_col_num;
-  //int tmp_deleted_cols_count = 0; 
+  ///*
   for (int i = threadIdx.x; i < total_dl_matrix_col_num;
        // // The below line will have negative effect of the col number is small
        //  i += (next_col[selected_row_idx + i] + blockDim.x - 1) / blockDim.x
@@ -23,37 +23,26 @@ __device__ void delete_rows_and_columns(
         if (deleted_rows[j] == 0 &&
             dl_matrix[j * total_dl_matrix_col_num + i] == 1) {
           deleted_rows[j] = search_depth;
-          //__syncthreads();
-          //break;
+
         }
       }
-    }
-    
-    
+    }    
   }
-  //__syncthreads();
-  //int col_id;
-  //int row_id;
-  //int val;
-  //int selected_row_val;
-  //int *selected_row = dl_matrix+selected_row_id * total_dl_matrix_col_num;
-//
-  //for (int i = threadIdx.x; i < total_dl_matrix_row_num * total_dl_matrix_col_num; i += blockDim.x){
-  //  row_id = i/total_dl_matrix_col_num;
-  //  col_id = i%total_dl_matrix_col_num;
-//
-  //  val = dl_matrix[i];
-  //  if(val ==0){
-  //    continue;
-  //  }
-  //  selected_row_val = selected_row[col_id];
-  //  //delete cols
-  //  if (val==1 && selected_row_val == 1 && deleted_cols[col_id]!=-1) {
-//
-  //    deleted_rows[row_id] = deleted_rows[row_id]==0?search_depth:deleted_rows[row_id];
-  //    deleted_cols[col_id] = deleted_cols[col_id]==0?search_depth:deleted_cols[col_id];
-  //  }
-  //}
+  //*/
+  /*
+  int * tmp_row;
+  int * tmp_next_col;
+  for (int i = threadIdx.x; i < total_dl_matrix_row_num; i += blockDim.x){
+    tmp_row = dl_matrix + i * total_dl_matrix_col_num;
+    tmp_next_col = next_col + i * total_dl_matrix_col_num;
+    for (int j = 0; j < total_dl_matrix_col_num; j += tmp_next_col[j]){
+      if (tmp_row[j] + selected_row[j] == 2 && deleted_cols[j] !=-1){
+        deleted_rows[i] = deleted_rows[i]==0?search_depth:deleted_rows[i];
+        deleted_cols[j] = deleted_cols[j]==0?search_depth:deleted_cols[j];
+      }
+    }
+  }
+  */
 
 }
 

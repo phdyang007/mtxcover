@@ -309,7 +309,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   timer.EndDataLoadTime();
 
   int hard_conflict_threshold = 500;
-  int graph_per_block=2;
+  int graph_per_block=1;
   int thread_count = 32;
   dim3 thread_size(thread_count,graph_per_block);
   cudaDeviceSynchronize();
