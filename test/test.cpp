@@ -6,12 +6,11 @@ using namespace std;
 
 int main()
 {
-    for(int i=1;i<10;i++){
-        cout<<i<<' '<<endl;
-        if(i==4){
-            i=1;
-        }
-    }
+    int a=1;
+    bool b=true;
+    int c =3;
+    bool d=false;
+    cout << (a==b) << ' ' << c*b << ' ' << c*d << endl;
 
     return 0;
 }

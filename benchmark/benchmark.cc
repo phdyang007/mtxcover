@@ -55,8 +55,8 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 10;
-  int debug_graph = 1691;
+  int debug_file = 2;
+  int debug_graph = 17;
   for (int i = 0; i < n; ++i) {
     // if (i != debug_file - 1) {
     //   continue;
@@ -73,36 +73,38 @@ int main(int argc, char *argv[]) {
 #ifdef CPU
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
-      double core_ns = 0;
       int j = 0;
-      int n = dataset.size();
-
-      #pragma omp parallel for schedule(dynamic) reduction(+:core_ns)
-      for (int i = 0; i < n; ++i) {
-        auto &ds = dataset[i];
-        // j++;
-        // if (j != debug_graph) {
-        //   continue;
-        // }
-        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
-        // "<<j<<std::endl;
-        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
-        core_ns += timer.GetCoreUsedNs();
-        if (validate) {
-          ValidateArray(ds.expected_result, ds.final_result);
-        }
-        // std::cout << "This thread is: " << std::this_thread::get_id() << std::endl;
-        if (dumpout) {
-          std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
-          if (of.is_open()) {
-            for (int i = 0; i < ds.final_result.size(); i++) {
-              of << ds.final_result[i] << ' ';
-            }
+      
+      double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
+              clock_type::now().time_since_epoch()).count();
+        #pragma omp parallel for num_threads(4) schedule(dynamic, 128)
+        for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
+            auto& ds = dataset[idx];
+          j++;
+          //if (j != debug_graph) {
+          //  continue;
+          //}
+          //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
+          auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
+          //core_ns += timer.GetCoreUsedNs();
+          if (validate) {
+            ValidateArray(ds.expected_result, ds.final_result);
           }
-          of << std::endl;
-          of.close();
+          if (dumpout) {
+            std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
+            if (of.is_open()) {
+              for (int i = 0; i < ds.final_result.size(); i++) {
+                of << ds.final_result[i] << ' ';
+              }
+            }
+            of << std::endl;
+            of.close();
+          }
         }
-      }
+      
+        double time_end = std::chrono::duration_cast<std::chrono::nanoseconds>(
+              clock_type::now().time_since_epoch()).count(); 
+        double core_ns = time_end - time_bgn;
       std::cout << "> Core Used NS: " << std::to_string(core_ns)
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }

@@ -16,8 +16,30 @@ void delete_rows_and_columns(int **dl_matrix, int *deleted_rows,
       }
     }
   }
+  //int col_id;
+  //int row_id;
+  //int val;
+  //int selected_row_val;
+  ////int *selected_row = dl_matrix+selected_row_id * total_dl_matrix_col_num;
+//
+  //for (int i = 0; i < total_dl_matrix_col_num*total_dl_matrix_row_num; i++){
+  //  row_id = i/total_dl_matrix_col_num;
+  //  col_id = i%total_dl_matrix_col_num;
+//
+  //  val = dl_matrix[row_id][col_id];
+  //  if(val == 0) {
+  //    continue;
+  //  }
+  //  selected_row_val = dl_matrix[selected_row_id][col_id];
+  //  //if (deleted_rows[row_id]==search_depth && row_id!=selected_row_id)
+//
+  //  if (val == 1 && selected_row_val == 1 && deleted_cols[col_id]!=-1) {
+  //    deleted_rows[row_id] = deleted_rows[row_id]==0?search_depth:deleted_rows[row_id];
+  //    deleted_cols[col_id] = deleted_cols[col_id]==0?search_depth:deleted_cols[col_id];
+//
+  //  }
+  //}
 }
-
 void init_vectors(int *vec, int vec_length, int value = 0) {
   for (int i = 0; i < vec_length; i++) {
     vec[i] = value;
