@@ -24,7 +24,7 @@ cpu.bin: basic.o target_fn.a
 
 gpumg.bin: basic.o target_fn.a
 	mkdir -p build
-	g++ -O2 -std=c++11 \
+	nvcc -O2 -std=c++11 \
 		  benchmark.cc build/target_fn.a build/basic.o	\
 		  -lcudart -DGPUMG -o build/$@
 

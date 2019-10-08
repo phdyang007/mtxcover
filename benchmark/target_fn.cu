@@ -6,7 +6,7 @@
 #include "../gpu-mg/MatrixCoverGPU.cuh"
 #include "../gpu/MatrixCoverGPU.cuh"
 
-#define THRESHOLD 500
+#define THRESHOLD 100
 // struct DataSets {
 //     int graph_count;
 //     std::vector<int> total_dl_matrix_row_num[2]={276,276};
