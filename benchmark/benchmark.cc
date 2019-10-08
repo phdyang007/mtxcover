@@ -1,9 +1,11 @@
-#include "common.h"
-#include "data_reader.h"
-#include "target_fn.h"
+#include <algorithm>
 #include <cstring>
 #include <fstream>
 #include <thread>
+
+#include "common.h"
+#include "data_reader.h"
+#include "target_fn.h"
 
 /*
 std::vector<std::string> test_datasets = {
@@ -64,7 +66,15 @@ int main(int argc, char *argv[]) {
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
-
+    // std::sort(dataset.begin(), dataset.end(),
+    //           [](const DataSet &lfs, const DataSet &rhs) {
+    //             return lfs.vertex_num < rhs.vertex_num;
+    //           });
+    std::sort(dataset.begin(), dataset.end(),
+              [](const DataSet &lfs, const DataSet &rhs) {
+                return (lfs.total_dl_matrix_col_num - lfs.vertex_num) <
+                       (rhs.total_dl_matrix_col_num - rhs.vertex_num);
+              });
     std::cout << "\n========================\n";
 
     // CPU
@@ -74,37 +84,40 @@ int main(int argc, char *argv[]) {
     std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
       int j = 0;
-      
+
       double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
-              clock_type::now().time_since_epoch()).count();
-        #pragma omp parallel for num_threads(4) schedule(dynamic, 128)
-        for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
-            auto& ds = dataset[idx];
-          j++;
-          //if (j != debug_graph) {
-          //  continue;
-          //}
-          //std::cout<<"dataset is "<<cpu_results[i]<<" component id is "<<j<<std::endl;
-          auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
-          //core_ns += timer.GetCoreUsedNs();
-          if (validate) {
-            ValidateArray(ds.expected_result, ds.final_result);
-          }
-          if (dumpout) {
-            std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
-            if (of.is_open()) {
-              for (int i = 0; i < ds.final_result.size(); i++) {
-                of << ds.final_result[i] << ' ';
-              }
-            }
-            of << std::endl;
-            of.close();
-          }
+                            clock_type::now().time_since_epoch())
+                            .count();
+#pragma omp parallel for num_threads(4) schedule(dynamic, 128)
+      for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
+        auto &ds = dataset[idx];
+        j++;
+        // if (j != debug_graph) {
+        //  continue;
+        //}
+        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
+        // "<<j<<std::endl;
+        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
+        // core_ns += timer.GetCoreUsedNs();
+        if (validate) {
+          ValidateArray(ds.expected_result, ds.final_result);
         }
-      
-        double time_end = std::chrono::duration_cast<std::chrono::nanoseconds>(
-              clock_type::now().time_since_epoch()).count(); 
-        double core_ns = time_end - time_bgn;
+        if (dumpout) {
+          std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
+          if (of.is_open()) {
+            for (int i = 0; i < ds.final_result.size(); i++) {
+              of << ds.final_result[i] << ' ';
+            }
+          }
+          of << std::endl;
+          of.close();
+        }
+      }
+
+      double time_end = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                            clock_type::now().time_since_epoch())
+                            .count();
+      double core_ns = time_end - time_bgn;
       std::cout << "> Core Used NS: " << std::to_string(core_ns)
                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
     }
