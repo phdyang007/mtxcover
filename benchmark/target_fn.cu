@@ -6,6 +6,7 @@
 #include "../gpu-mg/MatrixCoverGPU.cuh"
 #include "../gpu/MatrixCoverGPU.cuh"
 
+#define THRESHOLD 500
 // struct DataSets {
 //     int graph_count;
 //     std::vector<int> total_dl_matrix_row_num[2]={276,276};
@@ -31,11 +32,11 @@ MeasureTimer Invoke_ORIGINAL_CPU(DataSet *dataset, bool print_result) {
       dl_matrix[i][j] = dataset->dl_matrix[i * total_col + j];
     }
   }
-
+  int hard_conflict_threshold = THRESHOLD;
   timer.StartCoreTime();
   mc_solver(dl_matrix, results.data(), deleted_cols.data(),
             dataset->col_group.data(), dataset->vertex_num, total_row,
-            total_col);
+            total_col, hard_conflict_threshold);
   timer.EndCoreTime();
 
   dataset->final_result.clear();
@@ -308,7 +309,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
 
   timer.EndDataLoadTime();
 
-  int hard_conflict_threshold = 500;
+  int hard_conflict_threshold = THRESHOLD;
   int graph_per_block=1;
   int thread_count = 32;
   dim3 thread_size(thread_count,graph_per_block);

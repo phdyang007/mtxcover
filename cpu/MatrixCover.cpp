@@ -208,7 +208,7 @@ void print_matrix(int **mat, int row, int col) {
 
 void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
                int vertex_num, int total_dl_matrix_row_num,
-               int total_dl_matrix_col_num) {
+               int total_dl_matrix_col_num, int hard_conflict_threshold) {
   // to be refreshed if one conflict reaches many counts
   int search_depth = 0;
   int selected_row_id = 0;
@@ -222,7 +222,7 @@ void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
   int selected_row_id_in_previous_search;
   int conflict_node_id;
   int conflict_col_id;
-  int hard_conflict_threshold = 500;
+  //int hard_conflict_threshold = 100;
   bool token;
 
   // init lots of vectors

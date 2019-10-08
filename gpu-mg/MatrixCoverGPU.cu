@@ -297,7 +297,9 @@ init_vertex_group(int *row_group, int *dl_matrix, int* vertex_num, int* t_cn, in
 /// @param offset_matrix CSR
 /// @param graph_count total number of graphs 
 /// @param graph_per_block graphs that can be solved on one threadblock
-#define GRAPH_PER_BLOCK 2
+#define GRAPH_PER_BLOCK 1
+
+
 
 __global__ void
 mc_solver(int *dl_matrix, int *next_col, int *next_row, int *results,

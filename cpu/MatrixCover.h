@@ -81,7 +81,7 @@ int get_conflict_node_id(int *deleted_rows, int *row_group, int search_depth, in
 int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols, int *row_group, int conflict_node_id, int search_depth, int vertex_num, int total_dl_matrix_row_num, int total_dl_matrix_col_num);
 
 //
-void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group, int vertex_num, int total_dl_matrix_row_num, int total_dl_matrix_col_num);
+void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group, int vertex_num, int total_dl_matrix_row_num, int total_dl_matrix_col_num, int hard_conflict_threshold);
 
 
 void print_vec(int *vec, int vec_length);
