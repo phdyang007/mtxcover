@@ -60,9 +60,9 @@ int main(int argc, char *argv[]) {
   int debug_file = 2;
   int debug_graph = 17;
   for (int i = 0; i < n; ++i) {
-    if (i != debug_file - 1) {
-      continue;
-    }
+    // if (i != debug_file - 1) {
+    //   continue;
+    // }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
@@ -70,10 +70,19 @@ int main(int argc, char *argv[]) {
     //           [](const DataSet &lfs, const DataSet &rhs) {
     //             return lfs.vertex_num < rhs.vertex_num;
     //           });
+    // std::sort(dataset.begin(), dataset.end(),
+    //           [](const DataSet &lfs, const DataSet &rhs) {
+    //             return (lfs.total_dl_matrix_col_num - lfs.vertex_num) <
+    //                    (rhs.total_dl_matrix_col_num - rhs.vertex_num);
+    //           });
     std::sort(dataset.begin(), dataset.end(),
               [](const DataSet &lfs, const DataSet &rhs) {
-                return (lfs.total_dl_matrix_col_num - lfs.vertex_num) <
-                       (rhs.total_dl_matrix_col_num - rhs.vertex_num);
+                if (lfs.vertex_num != rhs.vertex_num) {
+                  return lfs.vertex_num < rhs.vertex_num;
+                } else {
+                  return (lfs.total_dl_matrix_col_num - lfs.vertex_num) <
+                         (rhs.total_dl_matrix_col_num - rhs.vertex_num);
+                }
               });
     std::cout << "\n========================\n";
 
