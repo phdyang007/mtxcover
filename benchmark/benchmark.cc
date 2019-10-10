@@ -60,9 +60,9 @@ int main(int argc, char *argv[]) {
   int debug_file = 2;
   int debug_graph = 17;
   for (int i = 0; i < n; ++i) {
-    // if (i != debug_file - 1) {
-    //   continue;
-    // }
+    if (i != debug_file - 1) {
+      continue;
+    }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
       double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
                             clock_type::now().time_since_epoch())
                             .count();
-#pragma omp parallel for num_threads(8) schedule(dynamic, 128)
+#pragma omp parallel for num_threads(16) schedule(dynamic, 128)
       for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
         auto &ds = dataset[idx];
         j++;
