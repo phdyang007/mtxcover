@@ -33,6 +33,9 @@ struct MCSolverTraits
     typedef int ColGroupType; 
     typedef int RowGroupType; 
     typedef int ConflictCountType; 
+
+    static constexpr int max_num_rows = MaxNumRows; 
+    static constexpr int max_num_cols = MaxNumCols;
 };
 
 template <>
@@ -45,6 +48,9 @@ struct MCSolverTraits<512, 128>
     typedef char ColGroupType; 
     typedef unsigned char RowGroupType; 
     typedef int ConflictCountType; 
+
+    static constexpr int max_num_rows = 512; 
+    static constexpr int max_num_cols = 128;
 };
 
 
