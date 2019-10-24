@@ -318,18 +318,25 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets<MCSolverTraitsType> *datasets, bool
   int graph_per_block=1;
   int thread_count = 32;
   dim3 thread_size(thread_count,graph_per_block);
+  gpu_mg::BitMatrices<unsigned int, MCSolverTraitsType::max_num_rows, MCSolverTraitsType::max_num_cols> dl_matrix_bits; 
+  dl_matrix_bits.init(datasets->dl_matrix.data(), datasets->offset_matrix.data(), datasets->total_dl_matrix_row_num.data(), datasets->total_dl_matrix_col_num.data(), n);
   cudaDeviceSynchronize();
 
   timer.StartCoreTime();
 
   gpu_mg::init_vertex_group<MCSolverTraitsType><<<n,32>>>(
-    row_group_gpu, dl_matrix_gpu, vertex_num_gpu, 
+    row_group_gpu, 
+    //dl_matrix_gpu, 
+    dl_matrix_bits, 
+    vertex_num_gpu, 
     total_dl_matrix_col_num_gpu, total_dl_matrix_row_num_gpu, 
     offset_row_gpu, offset_matrix_gpu,n);
 
   cudaProfilerStart();
   gpu_mg::mc_solver<MCSolverTraitsType><<<n/graph_per_block+1, thread_size>>>(
-      dl_matrix_gpu, next_col_gpu, next_row_gpu, results_gpu, deleted_cols_gpu,
+      //dl_matrix_gpu, 
+      dl_matrix_bits, 
+      next_col_gpu, next_row_gpu, results_gpu, deleted_cols_gpu,
       deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
       vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
       offset_col_gpu, offset_row_gpu, offset_matrix_gpu, search_depth_gpu,
@@ -383,6 +390,7 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets<MCSolverTraitsType> *datasets, bool
   }
   */
 
+  dl_matrix_bits.destroy();
   cudaFree(dl_matrix_gpu);
   cudaFree(next_col_gpu);
   cudaFree(next_row_gpu);
