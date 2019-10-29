@@ -13,6 +13,7 @@ struct DataSet {
   int total_dl_matrix_row_num;
   int total_dl_matrix_col_num;
   std::vector<int> dl_matrix;
+  std::vector<int> transpose_dl_matrix;
   std::vector<int> col_group;
   std::vector<int> next_row;
   std::vector<int> next_col;
@@ -29,6 +30,7 @@ struct DataSets {
   std::vector<int> offset_row;
   std::vector<int> offset_col;
   std::vector<int> dl_matrix;
+  std::vector<int> transpose_dl_matrix;
   std::vector<int> col_group;
 
   std::vector<int> next_row;
@@ -78,12 +80,14 @@ void ValidateArray(const std::vector<T> &a, const std::vector<T> &b) {
   std::cout << "expected n: " << an << "  final n: " << bn << std::endl;
   assert(an == bn);
   for (int i = 0; i < an; ++i) {
-    std::cout << a[i] << " <> " << b[i] << ", ";
+    if (a[i] != b[i]) {
+      std::cout << "i: " << i << "  " << a[i] << " <> " << b[i] << ", ";
+    }
     assert(a[i] == b[i]);
   }
   std::cout << std::endl;
 
-  //for (int i = 0; i < an; ++i) {
+  // for (int i = 0; i < an; ++i) {
   //  assert(a[i] == b[i]);
   //}
 }
