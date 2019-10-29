@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 2;
+  int debug_file = 5;
   int debug_graph = 17;
   for (int i = 0; i < n; ++i) {
     if (i != debug_file - 1) {
