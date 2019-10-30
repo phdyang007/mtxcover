@@ -225,22 +225,37 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   std::vector<int> deleted_rows(total_row, 0);
   std::vector<int> conflict_count(n, 0);
 
+  bool *bool_dl_matrix = new bool[datasets->bool_dl_matrix.size()];
+  bool *bool_transpose_dl_matrix =
+      new bool[datasets->bool_transpose_dl_matrix.size()];
+
+  for (int i = 0; i < datasets->bool_dl_matrix.size(); ++i) {
+    bool_dl_matrix[i] = datasets->bool_dl_matrix[i];
+    bool_transpose_dl_matrix[i] = datasets->bool_transpose_dl_matrix[i];
+  }
+
   timer.StartDataLoadTime();
-  int *dl_matrix_gpu;
-  int *transpose_dl_matrix_gpu;
+  bool *dl_matrix_gpu;
+  bool *transpose_dl_matrix_gpu;
   int *next_col_gpu;
   int *next_row_gpu;
   int *results_gpu;
   int *conflict_edge_gpu;
-  cudaMalloc(&dl_matrix_gpu, sizeof(int) * total_matrix);
-  cudaMalloc(&transpose_dl_matrix_gpu, sizeof(int) * total_matrix);
+  // cudaMalloc(&dl_matrix_gpu, sizeof(int) * total_matrix);
+  // cudaMalloc(&transpose_dl_matrix_gpu, sizeof(int) * total_matrix);
+  cudaMalloc(&dl_matrix_gpu, sizeof(bool) * total_matrix);
+  cudaMalloc(&transpose_dl_matrix_gpu, sizeof(bool) * total_matrix);
   // cudaMalloc(&conflict_edge_gpu, sizeof(int) * 2 * n);
   cudaMalloc(&next_col_gpu, sizeof(int) * total_matrix);
   cudaMalloc(&next_row_gpu, sizeof(int) * total_matrix);
-  cudaMemcpy(dl_matrix_gpu, datasets->dl_matrix.data(),
-             sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
-  cudaMemcpy(transpose_dl_matrix_gpu, datasets->transpose_dl_matrix.data(),
-             sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
+  // cudaMemcpy(dl_matrix_gpu, datasets->dl_matrix.data(),
+  //            sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
+  // cudaMemcpy(transpose_dl_matrix_gpu, datasets->transpose_dl_matrix.data(),
+  //            sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
+  cudaMemcpy(dl_matrix_gpu, bool_dl_matrix, sizeof(bool) * total_matrix,
+             cudaMemcpyHostToDevice);
+  cudaMemcpy(transpose_dl_matrix_gpu, bool_transpose_dl_matrix,
+             sizeof(bool) * total_matrix, cudaMemcpyHostToDevice);
   cudaMemcpy(next_col_gpu, datasets->next_col.data(),
              sizeof(int) * total_matrix, cudaMemcpyHostToDevice);
   cudaMemcpy(next_row_gpu, datasets->next_row.data(),
@@ -402,6 +417,8 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   // cudaFree(conflict_node_id_gpu);
   // cudaFree(existance_of_candidate_rows_gpu);
   // cudaFree(conflict_edge_gpu);
+  delete[] bool_dl_matrix;
+  delete[] bool_transpose_dl_matrix;
   return timer;
 }
 

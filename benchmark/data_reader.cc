@@ -38,6 +38,8 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
     int nm = dataset.total_dl_matrix_row_num * dataset.total_dl_matrix_col_num;
     dataset.dl_matrix.resize(nm);
     dataset.transpose_dl_matrix.resize(nm);
+    dataset.bool_dl_matrix.resize(nm);
+    dataset.bool_transpose_dl_matrix.resize(nm);
     dataset.next_col.resize(nm);
     dataset.next_row.resize(nm);
     dataset.col_group.resize(dataset.total_dl_matrix_col_num, 0);
@@ -54,6 +56,10 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
         dataset.transpose_dl_matrix[j * dataset.total_dl_matrix_row_num + i] =
             dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j];
       }
+    }
+    for (int i = 0; i < nm; ++i) {
+      dataset.bool_dl_matrix[i] = dataset.dl_matrix[i] == 1;
+      dataset.bool_transpose_dl_matrix[i] = dataset.transpose_dl_matrix[i] == 1;
     }
 
     for (int i = 0; i < dataset.vertex_num; ++i) {
@@ -119,6 +125,13 @@ DataSets CombineDatasets(const std::vector<DataSet> &dataset) {
     datasets.transpose_dl_matrix.insert(datasets.transpose_dl_matrix.end(),
                                         dataset[i].transpose_dl_matrix.begin(),
                                         dataset[i].transpose_dl_matrix.end());
+    datasets.bool_dl_matrix.insert(datasets.bool_dl_matrix.end(),
+                                   dataset[i].bool_dl_matrix.begin(),
+                                   dataset[i].bool_dl_matrix.end());
+    datasets.bool_transpose_dl_matrix.insert(
+        datasets.bool_transpose_dl_matrix.end(),
+        dataset[i].bool_transpose_dl_matrix.begin(),
+        dataset[i].bool_transpose_dl_matrix.end());
     datasets.col_group.insert(datasets.col_group.end(),
                               dataset[i].col_group.begin(),
                               dataset[i].col_group.end());

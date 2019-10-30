@@ -5,11 +5,11 @@ namespace gpu_mg {
 // constexpr int size_bit = 1 << 31;
 
 __device__ void delete_rows_and_columns(
-    int *dl_matrix, int *transpose_dl_matrix, const int *next_row,
+    bool *dl_matrix, bool *transpose_dl_matrix, const int *next_row,
     int *next_col, short *deleted_rows, short *deleted_cols,
     const int search_depth, const int selected_row_id,
     const int total_dl_matrix_row_num, const int total_dl_matrix_col_num) {
-  int *selected_row = dl_matrix + selected_row_id * total_dl_matrix_col_num;
+  bool *selected_row = dl_matrix + selected_row_id * total_dl_matrix_col_num;
   ///*
   for (int i = threadIdx.x; i < total_dl_matrix_col_num;
        // // The below line will have negative effect of the col number is small
@@ -18,7 +18,7 @@ __device__ void delete_rows_and_columns(
     if (deleted_cols[i] == 0 && selected_row[i] == 1) {
       deleted_cols[i] = search_depth;
       // atomicInc(&tmp_deleted_cols_count)
-      const int *transpose_dl_matrix_ptr =
+      const bool *transpose_dl_matrix_ptr =
           transpose_dl_matrix + i * total_dl_matrix_row_num;
       int nr = next_row[i * total_dl_matrix_row_num];
       for (int j = 0; j < total_dl_matrix_row_num;
@@ -113,7 +113,7 @@ __device__ void check_existance_of_candidate_rows(
   }
 }
 
-__device__ void get_vertex_row_group(int *row_group, int *dl_matrix,
+__device__ void get_vertex_row_group(int *row_group, bool *dl_matrix,
                                      const int vertex_num,
                                      const int total_dl_matrix_row_num,
                                      const int total_dl_matrix_col_num) {
@@ -121,7 +121,7 @@ __device__ void get_vertex_row_group(int *row_group, int *dl_matrix,
   for (int i = threadIdx.x; i < total_dl_matrix_row_num; i = i + blockDim.x) {
     for (int j = 0, cur_index = i * total_dl_matrix_col_num; j < vertex_num;
          j++, cur_index++) {
-      row_group[i] += dl_matrix[cur_index] * (j + 1);
+      row_group[i] += (int)(dl_matrix[cur_index]) * (j + 1);
     }
   }
 }
@@ -186,7 +186,7 @@ __device__ void get_conflict_node_id(short *deleted_rows, int *row_group,
   }
 }
 
-__device__ void get_conflict_edge(int *dl_matrix, short *deleted_rows,
+__device__ void get_conflict_edge(bool *dl_matrix, short *deleted_rows,
                                   int *row_group, const int conflict_node_id,
                                   const int search_depth, int *conflict_edge,
                                   const int vertex_num,
@@ -209,7 +209,7 @@ __device__ void get_conflict_edge(int *dl_matrix, short *deleted_rows,
   }
 }
 
-__device__ void get_conflict_col_id(int *dl_matrix, short *deleted_cols,
+__device__ void get_conflict_col_id(bool *dl_matrix, short *deleted_cols,
                                     int *conflict_col_id, int *conflict_edge,
                                     int total_dl_matrix_col_num,
                                     int vertex_num) {
@@ -217,8 +217,10 @@ __device__ void get_conflict_col_id(int *dl_matrix, short *deleted_cols,
   //  printf("conflict edge a %d edge b
   //  %d\n",conflict_edge[0],conflict_edge[1]);
   // }
-  int *edge_a_dlmatrix = dl_matrix + conflict_edge[0] * total_dl_matrix_col_num;
-  int *edge_b_dlmatrix = dl_matrix + conflict_edge[1] * total_dl_matrix_col_num;
+  bool *edge_a_dlmatrix =
+      dl_matrix + conflict_edge[0] * total_dl_matrix_col_num;
+  bool *edge_b_dlmatrix =
+      dl_matrix + conflict_edge[1] * total_dl_matrix_col_num;
   for (int j = threadIdx.x; j < total_dl_matrix_col_num; j = j + blockDim.x) {
     if (edge_a_dlmatrix[j] == edge_b_dlmatrix[j] && deleted_cols[j] > 0 &&
         edge_b_dlmatrix[j] == 1) {
@@ -273,7 +275,7 @@ __device__ void set_vector_value(int *device_var, int idx, int val) {
   device_var[idx] = val;
 }
 
-__global__ void init_vertex_group(int *row_group, int *dl_matrix,
+__global__ void init_vertex_group(int *row_group, bool *dl_matrix,
                                   int *vertex_num, int *t_cn, int *t_rn,
                                   int *offset_row, int *offset_matrix,
                                   int graph_count) {
@@ -304,7 +306,7 @@ __global__ void init_vertex_group(int *row_group, int *dl_matrix,
 #define GRAPH_PER_BLOCK 1
 
 __global__ void
-mc_solver(int *dl_matrix, int *transpose_dl_matrix, int *next_col,
+mc_solver(bool *dl_matrix, bool *transpose_dl_matrix, int *next_col,
           int *next_row, int *results, int *_deleted_cols, int *_deleted_rows,
           int *col_group, int *row_group, int *conflict_count, int *vertex_num,
           int *total_dl_matrix_row_num, int *total_dl_matrix_col_num,
@@ -335,8 +337,8 @@ mc_solver(int *dl_matrix, int *transpose_dl_matrix, int *next_col,
   __shared__ int *t_final_results[GRAPH_PER_BLOCK];
   __shared__ int t_row_group[GRAPH_PER_BLOCK][512];
   __shared__ int t_col_group[GRAPH_PER_BLOCK][256];
-  __shared__ int *t_dl_matrix[GRAPH_PER_BLOCK];
-  __shared__ int *t_transpose_dl_matrix[GRAPH_PER_BLOCK];
+  __shared__ bool *t_dl_matrix[GRAPH_PER_BLOCK];
+  __shared__ bool *t_transpose_dl_matrix[GRAPH_PER_BLOCK];
   __shared__ int *t_next_col[GRAPH_PER_BLOCK];
   __shared__ int *t_next_row[GRAPH_PER_BLOCK];
 
