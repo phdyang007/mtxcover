@@ -1,11 +1,9 @@
-#include <algorithm>
-#include <cstring>
-#include <fstream>
-#include <thread>
-
 #include "common.h"
 #include "data_reader.h"
 #include "target_fn.h"
+#include <cstring>
+#include <fstream>
+#include <thread>
 
 /*
 std::vector<std::string> test_datasets = {
@@ -57,53 +55,36 @@ int main(int argc, char *argv[]) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 5;
-  int debug_graph = 17;
+  int debug_file = 10;
+  int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
-    if (i != debug_file - 1) {
-      continue;
-    }
+    // if (i != debug_file - 1) {
+    //   continue;
+    // }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
-    // std::sort(dataset.begin(), dataset.end(),
-    //           [](const DataSet &lfs, const DataSet &rhs) {
-    //             return lfs.vertex_num < rhs.vertex_num;
-    //           });
-    // std::sort(dataset.begin(), dataset.end(),
-    //           [](const DataSet &lfs, const DataSet &rhs) {
-    //             return (lfs.total_dl_matrix_col_num - lfs.vertex_num) <
-    //                    (rhs.total_dl_matrix_col_num - rhs.vertex_num);
-    //           });
-    std::sort(dataset.begin(), dataset.end(),
-              [](const DataSet &lfs, const DataSet &rhs) {
-                if (lfs.vertex_num != rhs.vertex_num) {
-                  return lfs.vertex_num < rhs.vertex_num;
-                } else {
-                  return (lfs.total_dl_matrix_col_num - lfs.vertex_num) <
-                         (rhs.total_dl_matrix_col_num - rhs.vertex_num);
-                }
-              });
-    std::cout << "\n========================\n";
 
-    // CPU
-    std::cout << "\n>>> DataSet: " << tdataset
-              << "    Matrix Count: " << dataset.size() << std::endl;
+// std::cout << "\n========================\n";
+
+// CPU
+// std::cout << "\n>>> DataSet: " << tdataset
+//           << "    Matrix Count: " << dataset.size() << std::endl;
 #ifdef CPU
-    std::cout << "-----------------------\nCPU BENCHMARK\n\n";
+    // std::cout << "----------------------s-\nCPU BENCHMARK\n\n";
+    double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
+                          clock_type::now().time_since_epoch())
+                          .count();
     {
+      // double core_ns = 0;
       int j = 0;
-
-      double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            clock_type::now().time_since_epoch())
-                            .count();
-#pragma omp parallel for num_threads(16) schedule(dynamic, 128)
+#pragma omp parallel for num_threads(16) schedule(dynamic, 8)
       for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
         auto &ds = dataset[idx];
-        j++;
+        // j++;
         // if (j != debug_graph) {
-        //  continue;
-        //}
+        //   continue;
+        // }
         // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
         // "<<j<<std::endl;
         auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
@@ -122,56 +103,57 @@ int main(int argc, char *argv[]) {
           of.close();
         }
       }
-
       double time_end = std::chrono::duration_cast<std::chrono::nanoseconds>(
                             clock_type::now().time_since_epoch())
                             .count();
       double core_ns = time_end - time_bgn;
-      std::cout << "> Core Used NS: " << std::to_string(core_ns)
-                << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
+      std::cout << std::to_string(core_ns) << std::endl;
     }
 #endif
-// GPU
+    // GPU
 #ifdef GPU
-    std::cout << "-----------------------\nGPU BENCHMARK\n\n";
-    {
-      double core_ns = 0;
-      for (auto &ds : dataset) {
-        // j++;
-        // if(j!=debug_graph){continue;}
-        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
-        // "<<j<<std::endl;
-        auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
-        core_ns += timer.GetCoreUsedNs();
-        // std::cout << "> Load to GPU Used NS: "
-        //           << std::to_string(timer.GetDataLoadingNs()) <<
-        // std::endl;
-        if (validate) {
-          ValidateArray(ds.expected_result, ds.final_result);
-        }
-      }
-      std::cout << "> Core Used NS: " << std::to_string(core_ns)
-                << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
-    }
+//     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
+//     {
+//       double core_ns = 0;
+// #pragma omp parallel for num_threads(16) schedule(dynamic, 8)
+//       for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
+//         // j++;
+//         // if(j!=debug_graph){continue;}
+//         // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
+//         // "<<j<<std::endl;
+//         auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
+//         core_ns += timer.GetCoreUsedNs();
+//         // std::cout << "> Load to GPU Used NS: "
+//         //           << std::to_string(timer.GetDataLoadingNs()) <<
+//         // std::endl;
+//         if (validate) {
+//           ValidateArray(ds.expected_result, ds.final_result);
+//         }
+//       }
+//       std::cout << "> Core Used NS: " << std::to_string(core_ns)
+//                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
+//     }
 #endif
-// GPU_MG
+    // GPU_MG
 #ifdef GPUMG
     {
-      std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
+      // std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
       DataSets datasets = CombineDatasets(dataset);
       auto timer = Invoke(ImplVersion::ORIGINAL_GPU_MG, false, &datasets);
 
-      std::cout << "> Core Used NS: " << std::to_string(timer.GetCoreUsedNs())
-                << "   s:" << std::to_string(timer.GetCoreUsedNs() * 10e-10)
-                << std::endl;
-      std::cout << "> Load to GPU Used NS: "
-                << std::to_string(timer.GetDataLoadingNs()) << std::endl;
+      // std::cout << "> Core Used NS: " <<
+      // std::to_string(timer.GetCoreUsedNs())
+      //           << "   s:" << std::to_string(timer.GetCoreUsedNs() * 10e-10)
+      //           << std::endl;
+      // std::cout << "> Load to GPU Used NS: "
+      //           << std::to_string(timer.GetDataLoadingNs()) << std::endl;
+      std::cout << std::to_string(timer.GetCoreUsedNs()) << std::endl;
 
       if (validate) {
         ValidateArray(datasets.expected_result, datasets.final_result);
       }
     }
-    std::cout << "========================\n\n\n";
+// std::cout << "========================\n\n\n";
 #endif
   }
 

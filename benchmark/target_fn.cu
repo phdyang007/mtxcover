@@ -17,15 +17,18 @@ MeasureTimer Invoke_ORIGINAL_CPU(DataSet *dataset, bool print_result) {
   std::vector<int> results(total_row, 0);
   std::vector<int> deleted_cols(total_col, 0);
   int **dl_matrix = new int *[total_row];
+  int **next_row = new int *[total_row];
   for (int i = 0; i < total_row; i++) {
     dl_matrix[i] = new int[total_col];
+    next_row[i] = new int[total_col];
     for (int j = 0; j < total_col; j++) {
       dl_matrix[i][j] = dataset->dl_matrix[i * total_col + j];
+      next_row[i][j] = dataset->next_row[i * total_col + j];
     }
   }
   int hard_conflict_threshold = THRESHOLD;
   timer.StartCoreTime();
-  mc_solver(dl_matrix, results.data(), deleted_cols.data(),
+  mc_solver(dl_matrix, next_row, results.data(), deleted_cols.data(),
             dataset->col_group.data(), dataset->vertex_num, total_row,
             total_col, hard_conflict_threshold);
   timer.EndCoreTime();
@@ -64,8 +67,10 @@ MeasureTimer Invoke_ORIGINAL_CPU(DataSet *dataset, bool print_result) {
 
   for (int i = 0; i < total_row; i++) {
     delete[] dl_matrix[i];
+    delete[] next_row[i];
   }
   delete[] dl_matrix;
+  delete[] next_row;
 
   return timer;
 }
