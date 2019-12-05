@@ -419,6 +419,9 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
   // cudaFree(conflict_edge_gpu);
   delete[] bool_dl_matrix;
   delete[] bool_transpose_dl_matrix;
+
+  cudaDeviceReset();
+
   return timer;
 }
 
