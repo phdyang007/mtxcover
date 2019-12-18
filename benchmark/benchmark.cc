@@ -16,13 +16,19 @@ std::vector<std::string> validation_sets = {
 
 */
 ///*
+///*
 std::vector<std::string> test_datasets = {
     "../matrix/s1", "../matrix/s2", "../matrix/s3",  "../matrix/s4",
     "../matrix/s5", "../matrix/c1", "../matrix/c2",  "../matrix/c3",
     "../matrix/c4", "../matrix/c5", "../matrix/c6",  "../matrix/c7",
     "../matrix/c8", "../matrix/c9", "../matrix/c10",
 };
-
+//*/
+/*
+std::vector<std::string> test_datasets = {
+    "../matrix/s3",
+};
+*/
 std::vector<std::string> validation_sets = {
     "../dlresults/s1.txt", "../dlresults/s2.txt", "../dlresults/s3.txt",
     "../dlresults/s4.txt", "../dlresults/s5.txt", "../dlresults/c1.txt",
@@ -46,16 +52,17 @@ std::vector<std::string> gpu_results = {
     "../gpuresults/c5.txt", "../gpuresults/c6.txt", "../gpuresults/c7.txt",
     "../gpuresults/c8.txt", "../gpuresults/c9.txt", "../gpuresults/c10.txt",
 };
+
 //*/
 
 int main(int argc, char *argv[]) {
   bool validate = false;
-  bool dumpout = false;
+  bool dumpout = true;
   if (argc >= 2) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 10;
+  int debug_file = 1;
   int debug_graph = 1691;
   for (int i = 0; i < n; ++i) {
     // if (i != debug_file - 1) {
@@ -78,7 +85,7 @@ int main(int argc, char *argv[]) {
     {
       // double core_ns = 0;
       int j = 0;
-#pragma omp parallel for num_threads(16) schedule(dynamic, 8)
+//#pragma omp parallel for num_threads(16) schedule(dynamic, 8)
       for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
         auto &ds = dataset[idx];
         // j++;
