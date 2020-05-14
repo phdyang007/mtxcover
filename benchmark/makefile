@@ -1,4 +1,4 @@
-all: cpu.bin gpumg.bin
+all: cpu.bin gpu.bin gpumg.bin
 
 basic.o: common.h data_reader.h data_reader.cc
 	mkdir -p build
@@ -6,27 +6,32 @@ basic.o: common.h data_reader.h data_reader.cc
 
 target_fn.a: common.h target_fn.cu target_fn.h ../gpu/MatrixCoverGPU.cu ../gpu-mg/MatrixCoverGPU.cu
 	mkdir -p build
-	nvcc -w -c -O2 -lineinfo -arch=sm_35 -std=c++11 --expt-relaxed-constexpr -rdc=false -I../gpu-mg \
+	nvcc -c -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false -I../gpu \
+		../gpu/MatrixCoverGPU.cu -DBENCHMARK -o build/gpu_cover.o
+	nvcc -c -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false -I../gpu-mg \
 		../gpu-mg/MatrixCoverGPU.cu -DBENCHMARK -o build/gpu_mg_cover.o
-	nvcc -w -c -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false \
+	nvcc -c -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false \
 		target_fn.cu -o build/target_fn.o
-	gcc -w -c -O2 -std=c++11 -I../cpu ../cpu/MatrixCover.cpp \
-		-DBENCHMARK -fopenmp -o build/cpu_matrix_cover.o
+	gcc -c -O2 -std=c++11 -I../cpu ../cpu/MatrixCover.cpp \
+		-DBENCHMARK -o build/cpu_matrix_cover.o
 	ar cr build/target_fn.a build/gpu_mg_cover.o \
-		build/target_fn.o \
+		build/gpu_cover.o build/target_fn.o \
 		build/cpu_matrix_cover.o
 
 cpu.bin: basic.o target_fn.a
 	mkdir -p build
-	nvcc -w -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
-		 -lcudadevrt -Xcompiler -fopenmp benchmark.cc -DCPU -o  build/$@
+	nvcc -O2 -lineinfo -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
+		 -lcudadevrt benchmark.cc -DCPU -o  build/$@
 
+gpu.bin: basic.o target_fn.a
+	mkdir -p build
+	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
+		 -lcudadevrt benchmark.cc -DGPU -o build/$@
 
 gpumg.bin: basic.o target_fn.a
 	mkdir -p build
-	nvcc -w -O2 -std=c++11 \
-		  benchmark.cc build/target_fn.a build/basic.o	\
-		  -lcudart -DGPUMG -o build/$@
+	nvcc -O2 -arch=sm_35 -std=c++11 -rdc=false build/target_fn.a build/basic.o	\
+		 -lcudadevrt benchmark.cc -DGPUMG -o build/$@
 
 
 clean:

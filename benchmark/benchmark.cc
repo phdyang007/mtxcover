@@ -16,19 +16,13 @@ std::vector<std::string> validation_sets = {
 
 */
 ///*
-///*
 std::vector<std::string> test_datasets = {
     "../matrix/s1", "../matrix/s2", "../matrix/s3",  "../matrix/s4",
     "../matrix/s5", "../matrix/c1", "../matrix/c2",  "../matrix/c3",
     "../matrix/c4", "../matrix/c5", "../matrix/c6",  "../matrix/c7",
     "../matrix/c8", "../matrix/c9", "../matrix/c10",
 };
-//*/
-/*
-std::vector<std::string> test_datasets = {
-    "../matrix/s3",
-};
-*/
+
 std::vector<std::string> validation_sets = {
     "../dlresults/s1.txt", "../dlresults/s2.txt", "../dlresults/s3.txt",
     "../dlresults/s4.txt", "../dlresults/s5.txt", "../dlresults/c1.txt",
@@ -52,50 +46,50 @@ std::vector<std::string> gpu_results = {
     "../gpuresults/c5.txt", "../gpuresults/c6.txt", "../gpuresults/c7.txt",
     "../gpuresults/c8.txt", "../gpuresults/c9.txt", "../gpuresults/c10.txt",
 };
-
 //*/
 
 int main(int argc, char *argv[]) {
+    int total_conflict_num = 0;
+    int backtrace_num = 0;
   bool validate = false;
-  bool dumpout = true;
+  bool dumpout = false;
   if (argc >= 2) {
     validate = strcmp(argv[1], "1") == 0;
   }
   int n = test_datasets.size();
-  int debug_file = 1;
-  int debug_graph = 1691;
+  int debug_file = 3;
+  int debug_graph = 25;
   for (int i = 0; i < n; ++i) {
-    // if (i != debug_file - 1) {
-    //   continue;
-    // }
+    if (i != debug_file - 1) {
+      continue;
+    }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
 
-// std::cout << "\n========================\n";
+    std::cout << "\n========================\n";
 
-// CPU
-// std::cout << "\n>>> DataSet: " << tdataset
-//           << "    Matrix Count: " << dataset.size() << std::endl;
+    // CPU
+    std::cout << "\n>>> DataSet: " << tdataset
+              << "    Matrix Count: " << dataset.size() << std::endl;
 #ifdef CPU
-    // std::cout << "----------------------s-\nCPU BENCHMARK\n\n";
-    double time_bgn = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                          clock_type::now().time_since_epoch())
-                          .count();
+    std::cout << "-----------------------\nCPU BENCHMARK\n\n";
     {
-      // double core_ns = 0;
+      
+      double core_ns = 0;
       int j = 0;
-//#pragma omp parallel for num_threads(16) schedule(dynamic, 8)
-      for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
-        auto &ds = dataset[idx];
-        // j++;
-        // if (j != debug_graph) {
-        //   continue;
-        // }
-        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
-        // "<<j<<std::endl;
-        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds);
-        // core_ns += timer.GetCoreUsedNs();
+      for (auto &ds : dataset) {
+        
+          j++;
+//         if (j != debug_graph) {
+//           continue;
+//         }
+         std::cout<<"dataset is "<<cpu_results[i]<<" component id is"<<j<<std::endl;
+          
+        auto timer = Invoke(ImplVersion::ORIGINAL_CPU, true, &ds, backtrace_num, total_conflict_num);
+        core_ns += timer.GetCoreUsedNs();
+//        auto conflict_count = Invoke(ImplVersion::ORIGINAL_CPU, false, &ds, backtrace_num);
+//          total_conflict_num = total_conflict_num + conflict_count/3;
         if (validate) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
@@ -110,57 +104,53 @@ int main(int argc, char *argv[]) {
           of.close();
         }
       }
-      double time_end = std::chrono::duration_cast<std::chrono::nanoseconds>(
-                            clock_type::now().time_since_epoch())
-                            .count();
-      double core_ns = time_end - time_bgn;
-      std::cout << std::to_string(core_ns) << std::endl;
+//      std::cout << "> Core Used NS: " << std::to_string(core_ns)
+//                << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
+    std::cout << "Backtrace_number: " << backtrace_num << std::endl;
+        std::cout<< "total conflict number: "<< total_conflict_num << std::endl;
     }
 #endif
-    // GPU
+// GPU
 #ifdef GPU
-//     std::cout << "-----------------------\nGPU BENCHMARK\n\n";
-//     {
-//       double core_ns = 0;
-// #pragma omp parallel for num_threads(16) schedule(dynamic, 8)
-//       for (unsigned int idx = 0; idx < dataset.size(); ++idx) {
-//         // j++;
-//         // if(j!=debug_graph){continue;}
-//         // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
-//         // "<<j<<std::endl;
-//         auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds);
-//         core_ns += timer.GetCoreUsedNs();
-//         // std::cout << "> Load to GPU Used NS: "
-//         //           << std::to_string(timer.GetDataLoadingNs()) <<
-//         // std::endl;
-//         if (validate) {
-//           ValidateArray(ds.expected_result, ds.final_result);
-//         }
-//       }
-//       std::cout << "> Core Used NS: " << std::to_string(core_ns)
-//                 << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
-//     }
+    std::cout << "-----------------------\nGPU BENCHMARK\n\n";
+    {
+      double core_ns = 0;
+      for (auto &ds : dataset) {
+        // j++;
+        // if(j!=debug_graph){continue;}
+        // std::cout<<"dataset is "<<cpu_results[i]<<" component id is
+        // "<<j<<std::endl;
+        auto timer = Invoke(ImplVersion::ORIGINAL_GPU, false, &ds, backtrace_num, total_conflict_num);
+        core_ns += timer.GetCoreUsedNs();
+        // std::cout << "> Load to GPU Used NS: "
+        //           << std::to_string(timer.GetDataLoadingNs()) <<
+        // std::endl;
+        if (validate) {
+          ValidateArray(ds.expected_result, ds.final_result);
+        }
+      }
+      std::cout << "> Core Used NS: " << std::to_string(core_ns)
+                << "   s:" << std::to_string(core_ns * 10e-10) << std::endl;
+    }
 #endif
-    // GPU_MG
+// GPU_MG
 #ifdef GPUMG
     {
-      // std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
+      std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
       DataSets datasets = CombineDatasets(dataset);
-      auto timer = Invoke(ImplVersion::ORIGINAL_GPU_MG, false, &datasets);
+      auto timer = Invoke(ImplVersion::ORIGINAL_GPU_MG, false, &datasets, backtrace_num, total_conflict_num);
 
-      // std::cout << "> Core Used NS: " <<
-      // std::to_string(timer.GetCoreUsedNs())
-      //           << "   s:" << std::to_string(timer.GetCoreUsedNs() * 10e-10)
-      //           << std::endl;
-      // std::cout << "> Load to GPU Used NS: "
-      //           << std::to_string(timer.GetDataLoadingNs()) << std::endl;
-      std::cout << std::to_string(timer.GetCoreUsedNs()) << std::endl;
+      std::cout << "> Core Used NS: " << std::to_string(timer.GetCoreUsedNs())
+                << "   s:" << std::to_string(timer.GetCoreUsedNs() * 10e-10)
+                << std::endl;
+      std::cout << "> Load to GPU Used NS: "
+                << std::to_string(timer.GetDataLoadingNs()) << std::endl;
 
       if (validate) {
         ValidateArray(datasets.expected_result, datasets.final_result);
       }
     }
-// std::cout << "========================\n\n\n";
+    std::cout << "========================\n\n\n";
 #endif
   }
 

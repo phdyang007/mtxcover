@@ -13,14 +13,13 @@ struct DataSet {
   int total_dl_matrix_row_num;
   int total_dl_matrix_col_num;
   std::vector<int> dl_matrix;
-  std::vector<int> transpose_dl_matrix;
-  std::vector<bool> bool_dl_matrix;
-  std::vector<bool> bool_transpose_dl_matrix;
   std::vector<int> col_group;
   std::vector<int> next_row;
   std::vector<int> next_col;
   std::vector<int> expected_result;
   std::vector<int> final_result;
+  std::vector<int> search_order;
+    
 };
 
 struct DataSets {
@@ -32,9 +31,6 @@ struct DataSets {
   std::vector<int> offset_row;
   std::vector<int> offset_col;
   std::vector<int> dl_matrix;
-  std::vector<int> transpose_dl_matrix;
-  std::vector<bool> bool_dl_matrix;
-  std::vector<bool> bool_transpose_dl_matrix;
   std::vector<int> col_group;
 
   std::vector<int> next_row;
@@ -42,6 +38,7 @@ struct DataSets {
 
   std::vector<int> expected_result;
   std::vector<int> final_result;
+  std::vector<int> search_order;
 };
 
 class MeasureTimer {
@@ -81,17 +78,14 @@ template <typename T>
 void ValidateArray(const std::vector<T> &a, const std::vector<T> &b) {
   int an = a.size();
   int bn = b.size();
-  std::cout << "expected n: " << an << "  final n: " << bn << std::endl;
+  // std::cout << "expected n: " << an << "  final n: " << bn << std::endl;
   assert(an == bn);
-  for (int i = 0; i < an; ++i) {
-    //if (a[i] != b[i]) {
-      std::cout << "i: " << i << "  " << a[i] << " <> " << b[i] << ", ";
-    //}
-    //assert(a[i] == b[i]);
-  }
-  std::cout << std::endl;
-
   // for (int i = 0; i < an; ++i) {
-  //  assert(a[i] == b[i]);
-  //}
+  //   std::cout << a[i] << " <> " << b[i] << ", ";
+  // }
+  // std::cout << std::endl;
+
+  for (int i = 0; i < an; ++i) {
+    assert(a[i] == b[i]);
+  }
 }

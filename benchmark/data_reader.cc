@@ -13,6 +13,9 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
   std::string col_group_txt = matrix_folder + "/col.txt";
   std::string vertex_txt = matrix_folder + "/vetex.txt";
   std::string matrix_txt = matrix_folder + "/matrix.txt";
+  
+  std::string search_txt = matrix_folder + "/search.txt";
+  
   std::string validation_txt = result_txt;
 
   int n = 0;
@@ -28,6 +31,9 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
   std::ifstream vertex_file(vertex_txt);
   std::ifstream matrix_file(matrix_txt);
   std::ifstream validation_file(validation_txt);
+  
+  std::ifstream search_order_file(search_txt);
+    
 
   for (int k = 0; k < n; ++k) {
     DataSet dataset;
@@ -37,14 +43,17 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
 
     int nm = dataset.total_dl_matrix_row_num * dataset.total_dl_matrix_col_num;
     dataset.dl_matrix.resize(nm);
-    dataset.transpose_dl_matrix.resize(nm);
-    dataset.bool_dl_matrix.resize(nm);
-    dataset.bool_transpose_dl_matrix.resize(nm);
     dataset.next_col.resize(nm);
     dataset.next_row.resize(nm);
     dataset.col_group.resize(dataset.total_dl_matrix_col_num, 0);
     dataset.expected_result.resize(dataset.vertex_num, 0);
-
+    dataset.search_order.resize(dataset.vertex_num, 0);
+      
+      
+    for (int i = 0; i < dataset.vertex_num; ++i){
+        search_order_file >> dataset.search_order[i];
+    }
+      
     for (int i = 0; i < dataset.total_dl_matrix_col_num; ++i) {
       col_group_file >> dataset.col_group[i];
     }
@@ -53,13 +62,7 @@ ReadDataSetFromMatrixFolder(const std::string &matrix_folder,
       for (int j = 0; j < dataset.total_dl_matrix_col_num; ++j) {
         matrix_file >>
             dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j];
-        dataset.transpose_dl_matrix[j * dataset.total_dl_matrix_row_num + i] =
-            dataset.dl_matrix[i * dataset.total_dl_matrix_col_num + j];
       }
-    }
-    for (int i = 0; i < nm; ++i) {
-      dataset.bool_dl_matrix[i] = dataset.dl_matrix[i] == 1;
-      dataset.bool_transpose_dl_matrix[i] = dataset.transpose_dl_matrix[i] == 1;
     }
 
     for (int i = 0; i < dataset.vertex_num; ++i) {
@@ -122,16 +125,6 @@ DataSets CombineDatasets(const std::vector<DataSet> &dataset) {
     datasets.dl_matrix.insert(datasets.dl_matrix.end(),
                               dataset[i].dl_matrix.begin(),
                               dataset[i].dl_matrix.end());
-    datasets.transpose_dl_matrix.insert(datasets.transpose_dl_matrix.end(),
-                                        dataset[i].transpose_dl_matrix.begin(),
-                                        dataset[i].transpose_dl_matrix.end());
-    datasets.bool_dl_matrix.insert(datasets.bool_dl_matrix.end(),
-                                   dataset[i].bool_dl_matrix.begin(),
-                                   dataset[i].bool_dl_matrix.end());
-    datasets.bool_transpose_dl_matrix.insert(
-        datasets.bool_transpose_dl_matrix.end(),
-        dataset[i].bool_transpose_dl_matrix.begin(),
-        dataset[i].bool_transpose_dl_matrix.end());
     datasets.col_group.insert(datasets.col_group.end(),
                               dataset[i].col_group.begin(),
                               dataset[i].col_group.end());
@@ -139,6 +132,10 @@ DataSets CombineDatasets(const std::vector<DataSet> &dataset) {
     datasets.expected_result.insert(datasets.expected_result.end(),
                                     dataset[i].expected_result.begin(),
                                     dataset[i].expected_result.end());
+    
+    datasets.search_order.insert(datasets.search_order.end(),
+                                    dataset[i].search_order.begin(),
+                                    dataset[i].search_order.end());
 
     offset_matrix +=
         dataset[i].total_dl_matrix_col_num * dataset[i].total_dl_matrix_row_num;
