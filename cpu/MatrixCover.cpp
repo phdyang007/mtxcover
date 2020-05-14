@@ -1,17 +1,17 @@
 #include "MatrixCover.h"
-
-void delete_rows_and_columns(int **dl_matrix, int **next_row, int *deleted_rows,
+//#define TEST
+void delete_rows_and_columns(int **dl_matrix, int *deleted_rows,
                              int *deleted_cols, int search_depth,
                              int selected_row_id, int total_dl_matrix_row_num,
-                             int total_dl_matrix_col_num) {
+                             int total_dl_matrix_col_num, int *search_order) {
   for (int i = 0; i < total_dl_matrix_col_num; i++) {
     if (dl_matrix[selected_row_id][i] == 1 &&
         deleted_cols[i] ==
             0) { // we only delete rows that are not deleted or removed
-      deleted_cols[i] = search_depth;
-      for (int j = 0; j < total_dl_matrix_row_num; j += next_row[j][i]) {
+      deleted_cols[i] = search_order[search_depth-1];
+      for (int j = 0; j < total_dl_matrix_row_num; j++) {
         if (dl_matrix[j][i] == 1 && deleted_rows[j] == 0) {
-          deleted_rows[j] = search_depth;
+          deleted_rows[j] = search_order[search_depth-1];
         }
       }
     }
@@ -43,11 +43,11 @@ void init_vectors_reserved(int *vec, int vec_length, int value = 0) {
 
 bool check_existance_of_candidate_rows(int *deleted_rows, int *row_group,
                                        int search_depth,
-                                       int total_dl_matrix_row_num) {
+                                       int total_dl_matrix_row_num, int *search_order) {
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    // std::cout << deleted_rows[i] << ' ' << row_group[i] << std::endl;
-    if (deleted_rows[i] == 0 && row_group[i] == search_depth) {
-      // std::cout<<"Candidate Row Found...."<<std::endl;
+   //  std::cout << deleted_rows[i] << ' ' << row_group[i] << std::endl;
+    if (deleted_rows[i] == 0 && row_group[i] == search_order[search_depth-1]) {
+     //  std::cout<<"Candidate Row Found...."<<std::endl;
       return true;
     }
   }
@@ -65,19 +65,19 @@ void get_vertex_row_group(int *row_group, int **dl_matrix, int vertex_num,
 }
 
 int select_row(int *deleted_rows, int *row_group, int search_depth,
-               int total_dl_matrix_row_num) {
+               int total_dl_matrix_row_num, int *search_order) {
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    if (deleted_rows[i] == 0 && row_group[i] == search_depth) {
+    if (deleted_rows[i] == 0 && row_group[i] == search_order[search_depth-1]) {
       return i;
     }
   }
 }
 
 void recover_deleted_rows(int *deleted_rows, int search_depth,
-                          int total_dl_matrix_row_num) {
+                          int total_dl_matrix_row_num, int *search_order) {
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    if (abs(deleted_rows[i]) > search_depth ||
-        deleted_rows[i] == search_depth) {
+    if (abs(deleted_rows[i]) > search_order[search_depth-1] ||
+        deleted_rows[i] == search_order[search_depth-1]) {
       deleted_rows[i] = 0;
     }
   }
@@ -85,18 +85,18 @@ void recover_deleted_rows(int *deleted_rows, int search_depth,
 
 // To be optimized
 void recover_deleted_cols(int *deleted_cols, int search_depth,
-                          int total_dl_matrix_col_num) {
+                          int total_dl_matrix_col_num, int *search_order) {
   for (int i = 0; i < total_dl_matrix_col_num; i++) {
-    if (deleted_cols[i] >= search_depth) {
+    if (deleted_cols[i] >= search_order[search_depth-1]) {
       deleted_cols[i] = 0;
     }
   }
 }
 
 void recover_results(int *results, int search_depth,
-                     int total_dl_matrix_row_num) {
+                     int total_dl_matrix_row_num, int *search_order) {
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    if (results[i] == search_depth) {
+    if (results[i] == search_order[search_depth-1]) {
       results[i] = 0;
     }
   }
@@ -104,12 +104,11 @@ void recover_results(int *results, int search_depth,
 
 // need to optimized to map on GPU array
 int get_conflict_node_id(int *deleted_rows, int *row_group, int search_depth,
-                         int total_dl_matrix_row_num) {
+                         int total_dl_matrix_row_num, int *search_order) {
   int conflict_node_id = 0;
   for (int i = 0; i < total_dl_matrix_row_num; i++) {
-    if (row_group[i] == search_depth + 1) {
-      if (conflict_node_id < deleted_rows[i] &&
-          deleted_rows[i] < search_depth + 1) {
+    if (row_group[i] == search_order[search_depth]) {
+      if (conflict_node_id < deleted_rows[i] && deleted_rows[i] < search_order[search_depth]) {
         conflict_node_id = deleted_rows[i];
       }
     }
@@ -120,7 +119,7 @@ int get_conflict_node_id(int *deleted_rows, int *row_group, int search_depth,
 int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
                      int *row_group, int conflict_node_id, int search_depth,
                      int vertex_num, int total_dl_matrix_row_num,
-                     int total_dl_matrix_col_num) {
+                     int total_dl_matrix_col_num, int *search_order) {
   int conflict_col_id = 0;
   int idxa = 0;
   int idxb = 0;
@@ -130,7 +129,7 @@ int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
     if (deleted_rows[i] == -conflict_node_id) {
       idxa = i;
     }
-    if (row_group[i] == search_depth + 1 &&
+    if (row_group[i] == search_order[search_depth] &&
         deleted_rows[i] == conflict_node_id) {
       idxb = i;
     }
@@ -144,15 +143,16 @@ int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols,
     //}
   }
 #ifndef BENCHMARK
-  std::cout << "conflict rows are" << std::endl;
+  std::cout<< "conflict rows are"<<std::endl;
   print_vec(dl_matrix[idxa], total_dl_matrix_col_num);
   print_vec(dl_matrix[idxb], total_dl_matrix_col_num);
 #endif
   for (int j = vertex_num; j < total_dl_matrix_col_num; j++) {
-    if (dl_matrix[idxa][j] == dl_matrix[idxb][j] && dl_matrix[idxa][j] == 1) {
-      if (conflict_col_id < j) {
+    if (dl_matrix[idxa][j] == dl_matrix[idxb][j] && dl_matrix[idxa][j]==1) {
+      if(conflict_col_id<j){
         conflict_col_id = j;
       }
+
     }
   }
   return conflict_col_id;
@@ -184,10 +184,12 @@ void print_matrix(int **mat, int row, int col) {
   std::cout << std::endl;
 }
 
-void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols,
-               int *col_group, int vertex_num, int total_dl_matrix_row_num,
-               int total_dl_matrix_col_num, int hard_conflict_threshold) {
+void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group,
+               int vertex_num, int total_dl_matrix_row_num,
+               int total_dl_matrix_col_num, int &backtrace_num, int *search_order) {
   // to be refreshed if one conflict reaches many counts
+  //int backtrace_num = 0;
+  int total_conflict_num = 0;
   int search_depth = 0;
   int selected_row_id = 0;
   int *conflict_count = new int[total_dl_matrix_col_num];
@@ -200,7 +202,7 @@ void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols,
   int selected_row_id_in_previous_search;
   int conflict_node_id;
   int conflict_col_id;
-  // int hard_conflict_threshold = 100;
+  int hard_conflict_threshold = 500;
   bool token;
 
   // init lots of vectors
@@ -220,8 +222,9 @@ void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols,
 #endif
 
   for (search_depth = 1; search_depth <= vertex_num;) {
-    token = check_existance_of_candidate_rows(
-        deleted_rows, row_group, search_depth, total_dl_matrix_row_num);
+    token=check_existance_of_candidate_rows(
+            deleted_rows, row_group, search_depth,
+            total_dl_matrix_row_num, search_order);
 #ifndef BENCHMARK
     std::cout << "Deleted Cols" << std::endl;
     print_vec(deleted_cols, total_dl_matrix_col_num);
@@ -231,25 +234,28 @@ void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols,
     print_vec(conflict_count, total_dl_matrix_col_num);
     std::cout << "Results" << std::endl;
     print_vec(results, total_dl_matrix_row_num);
-    std::cin >> tmp;
+    
+    //  std::cin >> tmp;
+      
     std::cout << "search depth is " << search_depth << std::endl;
     std::cout << "existence of candicate row: " << token << std::endl;
+    std::cout << "backtrace number is" << backtrace_num << std::endl;
 #endif
 
     if (token) { // check if there are candidate rows
-                 // existing, if no, do backtrace
+                                        // existing, if no, do backtrace
       selected_row_id =
           select_row(deleted_rows, row_group, search_depth,
-                     total_dl_matrix_row_num); // select row and add to results
+                     total_dl_matrix_row_num, search_order); // select row and add to results
 #ifndef BENCHMARK
       std::cout << "selected id is " << selected_row_id << std::endl;
 #endif
-      results[selected_row_id] = search_depth;
+      results[selected_row_id] = search_order[search_depth-1];
       delete_rows_and_columns(
-          dl_matrix, next_row, deleted_rows, deleted_cols, search_depth,
-          selected_row_id, total_dl_matrix_row_num,
-          total_dl_matrix_col_num); // delete covered rows and columns
-      deleted_rows[selected_row_id] = -search_depth;
+          dl_matrix, deleted_rows, deleted_cols, search_depth, selected_row_id,
+          total_dl_matrix_row_num,
+          total_dl_matrix_col_num, search_order); // delete covered rows and columns
+      deleted_rows[selected_row_id] = -search_order[search_depth-1];
       search_depth++; // next step
       // print_vec(deleted_cols, total_dl_matrix_col_num);
       // print_vec(deleted_rows, total_dl_matrix_row_num);
@@ -258,35 +264,40 @@ void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols,
 
     } else { // do backtrace
       search_depth--;
+      backtrace_num++;
 #ifndef BENCHMARK
       std::cout << "search depth is" << search_depth << std::endl;
+     // std::cout << "backtrace number is" << backtrace_num << std::endl;
 #endif
+        
+       
+        
+        
       if (search_depth > 0) {
         conflict_node_id = get_conflict_node_id(
-            deleted_rows, row_group, search_depth, total_dl_matrix_row_num);
-        if (conflict_node_id > 0) {
-          conflict_col_id =
-              get_conflict_col(dl_matrix, deleted_rows, deleted_cols, row_group,
-                               conflict_node_id, search_depth, vertex_num,
-                               total_dl_matrix_row_num,
-                               total_dl_matrix_col_num); // get conflict edge
+            deleted_rows, row_group, search_depth, total_dl_matrix_row_num, search_order);
+        if(conflict_node_id>0){
+          conflict_col_id = get_conflict_col(
+              dl_matrix, deleted_rows, deleted_cols, row_group, conflict_node_id,
+              search_depth, vertex_num, total_dl_matrix_row_num,
+              total_dl_matrix_col_num, search_order); // get conflict edge
 #ifndef BENCHMARK
           std::cout << "conflict node id is " << conflict_node_id << std::endl;
           std::cout << "conflict col id is " << conflict_col_id << std::endl;
-// if(conflict_col_id==0){std::cin>>tmp;}
+          //if(conflict_col_id==0){std::cin>>tmp;}
 #endif
           conflict_count[conflict_col_id]++; // update conflict edge count
           recover_deleted_rows(deleted_rows, search_depth,
-                               total_dl_matrix_row_num); // recover deleted rows
-                                                         // previously selected
-                                                         // rows
+                              total_dl_matrix_row_num, search_order); // recover deleted rows
+                                                        // previously selected
+                                                        // rows
           recover_deleted_cols(deleted_cols, search_depth,
-                               total_dl_matrix_col_num); // recover deleted cols
-                                                         // except afftected by
-                                                         // previously selected
-                                                         // rows
+                              total_dl_matrix_col_num, search_order); // recover deleted cols
+                                                        // except afftected by
+                                                        // previously selected
+                                                        // rows
           recover_results(results, search_depth,
-                          total_dl_matrix_row_num); // recover results
+                          total_dl_matrix_row_num, search_order); // recover results
 
           if (conflict_count[conflict_col_id] > hard_conflict_threshold) {
             search_depth = 1;
@@ -300,22 +311,26 @@ void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols,
           }
         } else {
           recover_deleted_rows(deleted_rows, search_depth,
-                               total_dl_matrix_row_num); // recover deleted rows
-                                                         // previously selected
-                                                         // rows
+                              total_dl_matrix_row_num, search_order); // recover deleted rows
+                                                        // previously selected
+                                                        // rows
           recover_deleted_cols(deleted_cols, search_depth,
-                               total_dl_matrix_col_num); // recover deleted cols
-                                                         // except afftected by
-                                                         // previously selected
-                                                         // rows
+                              total_dl_matrix_col_num, search_order); // recover deleted cols
+                                                        // except afftected by
+                                                        // previously selected
+                                                        // rows
           recover_results(results, search_depth,
-                          total_dl_matrix_row_num); // recover results
+                          total_dl_matrix_row_num, search_order); // recover results
         }
       } else { // if all vertices are gone through, directly remove the edge
                // with largest conflict count.
         search_depth = 1;
         conflict_col_id =
             get_largest_value(conflict_count, total_dl_matrix_col_num);
+          
+//        total_conflict_num = total_conflict_num + conflict_count[conflict_col_id];
+          
+        
         init_vectors(conflict_count, total_dl_matrix_col_num);
         init_vectors_reserved(deleted_cols, total_dl_matrix_col_num);
         init_vectors(deleted_rows, total_dl_matrix_row_num);
@@ -324,12 +339,20 @@ void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols,
                     total_dl_matrix_col_num);
       }
     }
+    
   }
 #ifndef BENCHMARK
   print_matrix(dl_matrix, total_dl_matrix_row_num, total_dl_matrix_col_num);
+#endif
+    
+#ifdef TEST
+  std::cout << "total conflict number is: " << total_conflict_num << std::endl;
 #endif
   delete[] deleted_rows;
   delete[] row_group;
   delete[] vertices_covered;
   delete[] conflict_count;
+
+	return;
+
 }

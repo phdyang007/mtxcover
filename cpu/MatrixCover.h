@@ -40,6 +40,17 @@ c2|   1              1
 
 //
 
+//Operation of delete rows and columns
+void delete_rows_and_columns(
+    int **dl_matrix,
+    int *deleted_rows,
+    int *deleted_cols,
+    int search_depth,
+    int selected_row_id,
+    int total_dl_matrix_row_num,
+    int total_dl_matrix_col_num,
+    int *search_order);
+
 //initialize vectors to #value
 void init_vectors(int *vec, int vec_length, int value);
 
@@ -47,31 +58,31 @@ void init_vectors(int *vec, int vec_length, int value);
 int get_largest_value(int *vec, int vec_length);
 
 //
-bool check_existance_of_candidate_rows(int *deleted_rows, int *row_group, int search_depth, int total_dl_matrix_row_num);
+bool check_existance_of_candidate_rows(int *deleted_rows, int *row_group, int search_depth, int total_dl_matrix_row_num, int *search_order);
 
 // row_grouping rows by different vertices e.g. [1 1 2 2 3 3 4 4 4 4]
 void get_vertex_row_group(int *row_group, int **dl_matrix, int vertex_num, int total_dl_matrix_row_num);
 
 //select one row
-int select_row(int *deleted_rows, int *row_group, int search_depth, int total_dl_matrix_row_num);
+int select_row(int *deleted_rows, int *row_group, int search_depth, int total_dl_matrix_row_num, int *search_order);
 
 //
-void recover_deleted_rows(int *deleted_rows, int search_depth, int total_dl_matrix_row_num);
+void recover_deleted_rows(int *deleted_rows, int search_depth, int total_dl_matrix_row_num, int *search_order);
 
 //
-void recover_deleted_cols(int **dl_matrix, int *deleted_cols, int search_depth, int total_dl_matrix_col_num);
+void recover_deleted_cols(int **dl_matrix, int *deleted_cols, int search_depth, int total_dl_matrix_col_num, int *search_order);
 
 //
-void recover_results(int *results, int search_depth, int total_dl_matrix_row_num);
+void recover_results(int *results, int search_depth, int total_dl_matrix_row_num, int *search_order);
 
 //
-int get_conflict_node_id(int *deleted_rows, int *row_group, int search_depth, int total_dl_matrix_row_num);
+int get_conflict_node_id(int *deleted_rows, int *row_group, int search_depth, int total_dl_matrix_row_num, int *search_order);
 
 //
-int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols, int *row_group, int conflict_node_id, int search_depth, int vertex_num, int total_dl_matrix_row_num, int total_dl_matrix_col_num);
+int get_conflict_col(int **dl_matrix, int *deleted_rows, int *deleted_cols, int *row_group, int conflict_node_id, int search_depth, int vertex_num, int total_dl_matrix_row_num, int total_dl_matrix_col_num, int *search_order);
 
 //
-void mc_solver(int **dl_matrix, int **next_row, int *results, int *deleted_cols, int *col_group, int vertex_num, int total_dl_matrix_row_num, int total_dl_matrix_col_num, int hard_conflict_threshold);
+void mc_solver(int **dl_matrix, int *results, int *deleted_cols, int *col_group, int vertex_num, int total_dl_matrix_row_num, int total_dl_matrix_col_num, int &backtrace_num, int *search_order);
 
 
 void print_vec(int *vec, int vec_length);
