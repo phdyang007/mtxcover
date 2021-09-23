@@ -306,16 +306,34 @@ __global__ void init_vertex_group(int *row_group, bool *dl_matrix,
 #define GRAPH_PER_BLOCK 1
 
 __global__ void
-mc_solver(bool *dl_matrix, bool *transpose_dl_matrix, int *next_col,
-          int *next_row, int *results, int *_deleted_cols, int *_deleted_rows,
-          int *col_group, int *row_group, int *conflict_count, int *vertex_num,
-          int *total_dl_matrix_row_num, int *total_dl_matrix_col_num,
-          int *offset_col, int *offset_row, int *offset_matrix,
-          int *_search_depth, int *_selected_row_id,
-          int *_current_conflict_count, int *_conflict_node_id,
-          int *_conflict_col_id, int *_existance_of_candidate_rows,
-          int *_conflict_edge, int *_max, const int graph_count,
-          const int hard_conflict_threshold, const int graph_per_block) {
+mc_solver(
+        bool *dl_matrix,
+        bool *transpose_dl_matrix,
+        int *next_col,
+        int *next_row,
+        int *results,
+        int *_deleted_cols,
+        int *_deleted_rows,
+        int *col_group,
+        int *row_group,
+        int *conflict_count,
+        int *vertex_num,
+        int *total_dl_matrix_row_num,
+        int *total_dl_matrix_col_num,
+        int *offset_col,
+        int *offset_row,
+        int *offset_matrix,
+        int *_search_depth,
+        int *_selected_row_id,
+        int *_current_conflict_count,
+        int *_conflict_node_id,
+        int *_conflict_col_id,
+        int *_existance_of_candidate_rows,
+        int *_conflict_edge,
+        int *_max,
+        const int graph_count,
+        const int hard_conflict_threshold,
+        const int graph_per_block) {
 
   // add shared mem
 
@@ -414,15 +432,15 @@ mc_solver(bool *dl_matrix, bool *transpose_dl_matrix, int *next_col,
       // std::cout<<"deleted_cols "<<std::endl;
       // cudaDeviceSynchronize();
       printf("deleted_cols\n");
-      print_vec(t_deleted_cols[sub_graph_id], t_cn[sub_graph_id]);
+    //   print_vec(t_deleted_cols[sub_graph_id], t_cn[sub_graph_id]);
       // cudaDeviceSynchronize();
       // cudaDeviceSynchronize();
       printf("deleted_rows\n");
-      print_vec(t_deleted_rows[sub_graph_id], t_rn[sub_graph_id]);
+    //   print_vec(t_deleted_rows[sub_graph_id], t_rn[sub_graph_id]);
       // cudaDeviceSynchronize();
       // cudaDeviceSynchronize();
       printf("results\n");
-      print_vec(t_results[sub_graph_id], t_rn[sub_graph_id]);
+    //   print_vec(t_results[sub_graph_id], t_rn[sub_graph_id]);
 // cudaDeviceSynchronize();
 #endif
 

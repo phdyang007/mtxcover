@@ -173,12 +173,28 @@ int main()
 
 
     cudaDeviceSynchronize();
-    gpu_mg::mc_solver<<<2,32>>>(dl_matrix_gpu, results_gpu, 
-        deleted_cols_gpu, deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
-        vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
-        offset_col_gpu, offset_row_gpu, offset_matrix_gpu,
-        search_depth_gpu, selected_row_id_gpu, current_conflict_count_gpu, conflict_node_id_gpu, conflict_col_id_gpu, existance_of_candidate_rows_gpu,
-        graph_count, hard_conflict_threshold);
+    gpu_mg::mc_solver<<<2,32>>>(
+        dl_matrix_gpu,
+        results_gpu,
+        deleted_cols_gpu,
+        deleted_rows_gpu,
+        col_group_gpu,
+        row_group_gpu,
+        conflict_count_gpu,
+        vertex_num_gpu,
+        total_dl_matrix_row_num_gpu,
+        total_dl_matrix_col_num_gpu,
+        offset_col_gpu,
+        offset_row_gpu,
+        offset_matrix_gpu,
+        search_depth_gpu,
+        selected_row_id_gpu,
+        current_conflict_count_gpu,
+        conflict_node_id_gpu,
+        conflict_col_id_gpu,
+        existance_of_candidate_rows_gpu,
+        graph_count,
+        hard_conflict_threshold);
     cudaDeviceSynchronize();
     //mc_solver(dl_matrix_gpu, results_gpu, deleted_cols_gpu, deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu, vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu);
     std::cout<<"================================================================================================================================="<<std::endl;
