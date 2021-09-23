@@ -1,6 +1,6 @@
 #include "MatrixCoverGPU.cuh"
 #include <iostream>
-#include <fstream> 
+#include <fstream>
 #include <cstdio>
 
 
@@ -34,17 +34,14 @@ int main()
         {
             for (int j = 0; j < total_dl_matrix_col_num[k]; j++)
             {
-    
                 file>>dl_matrix[offset_matrix[k]+i*total_dl_matrix_col_num[k]+j];
             }
-     
         }
     }
 
     std::cout<<"reading dl matrix from file  DONE"<<std::endl;
 
 
-  
 
 	std::ifstream col("col.txt");
     //int *deleted_cols = new int[total_dl_matrix_col_num];
@@ -63,8 +60,6 @@ int main()
 
 
     //int *results = new int[total_dl_matrix_row_num];
-
-    
 
     //allocate necessary vectors and matrix on GPU
     int *dl_matrix_gpu;
@@ -128,7 +123,6 @@ int main()
     cudaMalloc(&conflict_node_id_gpu, sizeof(int*)*graph_count);
     cudaMalloc(&conflict_col_id_gpu, sizeof(int*)*graph_count);
     cudaMalloc(&existance_of_candidate_rows_gpu, sizeof(int*)*graph_count);
-    
 
     int hard_conflict_threshold=500;
 
@@ -171,9 +165,9 @@ int main()
     //print_vec_g<<<1,1>>>(col_group_gpu, total_col);
 
 
-
     cudaDeviceSynchronize();
-    gpu_mg::mc_solver<<<2,32>>>(dl_matrix_gpu, results_gpu, 
+    gpu_mg::mc_solver<<<2,32>>>(
+        dl_matrix_gpu, results_gpu,
         deleted_cols_gpu, deleted_rows_gpu, col_group_gpu, row_group_gpu, conflict_count_gpu,
         vertex_num_gpu, total_dl_matrix_row_num_gpu, total_dl_matrix_col_num_gpu,
         offset_col_gpu, offset_row_gpu, offset_matrix_gpu,
