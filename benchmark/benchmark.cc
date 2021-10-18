@@ -70,6 +70,8 @@ int main(int argc, char *argv[]) {
     // }
     const auto &tdataset = test_datasets[i];
     const auto &vset = cpu_results[i];
+    // const auto &vset = validation_sets[i];
+    std::cout << "dataset: " << tdataset << std::endl;
     std::vector<DataSet> dataset = ReadDataSetFromMatrixFolder(tdataset, vset);
 
 // std::cout << "\n========================\n";
@@ -100,6 +102,7 @@ int main(int argc, char *argv[]) {
           ValidateArray(ds.expected_result, ds.final_result);
         }
         if (dumpout) {
+          std::cout << "Dumpout CPU results." << std::endl;
           std::fstream of(cpu_results[i], std::ios::out | std::ios::app);
           if (of.is_open()) {
             for (int i = 0; i < ds.final_result.size(); i++) {
@@ -146,18 +149,29 @@ int main(int argc, char *argv[]) {
     {
       // std::cout << "-----------------------\nGPU MG BENCHMARK\n\n";
       DataSets datasets = CombineDatasets(dataset);
-      auto timer = Invoke(ImplVersion::ORIGINAL_GPU_MG, false, &datasets);
+      auto timer = Invoke(ImplVersion::ORIGINAL_GPU_MG, true, &datasets);
 
-      // std::cout << "> Core Used NS: " <<
-      // std::to_string(timer.GetCoreUsedNs())
-      //           << "   s:" << std::to_string(timer.GetCoreUsedNs() * 10e-10)
-      //           << std::endl;
-      // std::cout << "> Load to GPU Used NS: "
-      //           << std::to_string(timer.GetDataLoadingNs()) << std::endl;
+      std::cout << "> Core Used NS: " <<
+      std::to_string(timer.GetCoreUsedNs())
+                << "   s:" << std::to_string(timer.GetCoreUsedNs() * 10e-10)
+                << std::endl;
+      std::cout << "> Load to GPU Used NS: "
+                << std::to_string(timer.GetDataLoadingNs()) << std::endl;
       std::cout << std::to_string(timer.GetCoreUsedNs()) << std::endl;
 
       if (validate) {
         ValidateArray(datasets.expected_result, datasets.final_result);
+      }
+      if (dumpout) {
+        std::cout << "Dumpout GPU results." << std::endl;
+        std::fstream of(gpu_results[i], std::ios::out | std::ios::app);
+        if (of.is_open()) {
+          for (int i = 0; i < datasets.final_result.size(); i++) {
+            of << datasets.final_result[i] << ' ';
+          }
+        }
+        of << std::endl;
+        of.close();
       }
     }
 // std::cout << "========================\n\n\n";

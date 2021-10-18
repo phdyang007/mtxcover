@@ -372,21 +372,21 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
       }
     }
   }
-  /*
+//   /*
   if (print_result) {
     cudaMemcpy(deleted_cols.data(), deleted_cols_gpu, sizeof(int) * total_col,
                cudaMemcpyDeviceToHost);
     for (int k = 0; k < n; k++) {
-      for (int i = 0; i < datasets->total_dl_matrix_row_num[k]; i++) {
-        std::cout << results[datasets->offset_row[k] + i] << ' ';
-      }
-      std::cout << std::endl;
-      for (int i = 0; i < datasets->total_dl_matrix_row_num[k]; i++) {
-        if (results[datasets->offset_row[k] + i] > 0) {
-          std::cout << i << ' ';
-        }
-      }
-      std::cout << std::endl;
+    //   for (int i = 0; i < datasets->total_dl_matrix_row_num[k]; i++) {
+    //     std::cout << results[datasets->offset_row[k] + i] << ' ';
+    //   }
+    //   std::cout << std::endl;
+    //   for (int i = 0; i < datasets->total_dl_matrix_row_num[k]; i++) {
+    //     if (results[datasets->offset_row[k] + i] > 0) {
+    //       std::cout << i << ' ';
+    //     }
+    //   }
+    //   std::cout << std::endl;
       for (int i = 0; i < datasets->total_dl_matrix_col_num[k]; i++) {
         if (deleted_cols[datasets->offset_col[k] + i] == -1) {
           conflict_count[k]++;
@@ -394,10 +394,12 @@ MeasureTimer Invoke_ORIGINAL_GPU_MG(DataSets *datasets, bool print_result) {
       }
 
       // 3 is the number of color
-      std::cout << "Conflict Num is " << conflict_count[k] / 3 << std::endl;
+      if (conflict_count[k] > 0){
+        std::cout << "Conflict Num is " << conflict_count[k] / 3 << std::endl;
+      }
     }
   }
-  */
+//   */
 
   cudaFree(dl_matrix_gpu);
   cudaFree(next_col_gpu);
