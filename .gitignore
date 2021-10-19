@@ -4,3 +4,5 @@
 build/
 *.a
 test/
+
+**.DS_Store**

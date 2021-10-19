@@ -432,15 +432,15 @@ mc_solver(
       // std::cout<<"deleted_cols "<<std::endl;
       // cudaDeviceSynchronize();
       printf("deleted_cols\n");
-      print_vec(t_deleted_cols[sub_graph_id], t_cn[sub_graph_id]);
+      // print_vec(t_deleted_cols[sub_graph_id], t_cn[sub_graph_id]);
       // cudaDeviceSynchronize();
       // cudaDeviceSynchronize();
       printf("deleted_rows\n");
-      print_vec(t_deleted_rows[sub_graph_id], t_rn[sub_graph_id]);
+      // print_vec(t_deleted_rows[sub_graph_id], t_rn[sub_graph_id]);
       // cudaDeviceSynchronize();
       // cudaDeviceSynchronize();
       printf("results\n");
-      print_vec(t_results[sub_graph_id], t_rn[sub_graph_id]);
+      // print_vec(t_results[sub_graph_id], t_rn[sub_graph_id]);
 // cudaDeviceSynchronize();
 #endif
 
